@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <meta name="theme-color" content="#0a0e1a" />
+  <meta name="theme-color" content="#080c14" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <title>🦠 Hantavirus Tracker — Live Global Surveillance</title>
@@ -17,25 +17,23 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg:       #0a0e1a;
-      --surface:  #111827;
-      --surface2: #1a2235;
-      --border:   #1e2d45;
-      --accent:   #3b82f6;
-      --cyan:     #06b6d4;
-      --red:      #ef4444;
-      --orange:   #f97316;
-      --yellow:   #eab308;
-      --green:    #22c55e;
-      --text:     #e2e8f0;
-      --muted:    #64748b;
-      --sidebar-w: 320px;
-      --header-h: 56px;
-      --drawer-peek: 72px;
+      --bg:        #080c14;
+      --surface:   #0f1623;
+      --surface2:  #162032;
+      --border:    #1e3050;
+      --accent:    #3b82f6;
+      --cyan:      #06b6d4;
+      --red:       #ef4444;
+      --orange:    #f97316;
+      --purple:    #8b5cf6;
+      --sky:       #0ea5e9;
+      --text:      #e2e8f0;
+      --muted:     #64748b;
+      --sidebar-w: 340px;
     }
 
     html, body {
-      height: 100%; height: 100dvh;
+      height: 100%;
       background: var(--bg);
       color: var(--text);
       font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
@@ -46,11 +44,12 @@
     :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
     /* ═══════════════════════════════════════════════════════════════
-       DESKTOP LAYOUT  (≥ 768px)
+       DESKTOP LAYOUT (≥768px) — sidebar left, map right
     ═══════════════════════════════════════════════════════════════ */
     #app {
       display: flex;
-      height: 100vh; height: 100dvh;
+      height: 100vh;
+      height: 100dvh;
       overflow: hidden;
     }
 
@@ -66,53 +65,72 @@
       overflow: hidden;
       flex-shrink: 0;
       z-index: 20;
-      transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
     }
 
     #sidebar-header {
-      padding: 16px 16px 12px;
-      background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+      padding: 18px 18px 14px;
+      background: linear-gradient(160deg, #080c14 0%, #0d1a3a 100%);
       border-bottom: 1px solid var(--border);
       flex-shrink: 0;
     }
 
-    .logo-row { display: flex; align-items: center; gap: 10px; }
+    .logo-row { display: flex; align-items: center; gap: 12px; }
 
     .logo-icon {
-      width: 34px; height: 34px;
-      background: radial-gradient(circle, #ef4444 0%, #7f1d1d 100%);
+      width: 38px; height: 38px;
+      background: radial-gradient(circle at 35% 35%, #ef4444 0%, #7f1d1d 100%);
       border-radius: 50%;
       display: flex; align-items: center; justify-content: center;
-      font-size: 17px;
-      box-shadow: 0 0 14px rgba(239,68,68,0.45);
+      font-size: 18px;
+      box-shadow: 0 0 18px rgba(239,68,68,0.5);
       flex-shrink: 0;
     }
 
-    .logo-text h1 { font-size: 14px; font-weight: 700; color: #f1f5f9; letter-spacing: -0.2px; }
-    .logo-text p  { font-size: 10px; color: #f59e0b; font-weight: 500; margin-top: 2px; }
+    .logo-text h1 {
+      font-size: 15px; font-weight: 700; color: #f1f5f9; letter-spacing: -0.3px;
+    }
+    .logo-text p {
+      font-size: 10px; color: #f59e0b; font-weight: 500; margin-top: 3px;
+      letter-spacing: 0.3px;
+    }
 
     /* ── Stats bar ── */
     #stats-bar {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(4, 1fr);
       gap: 1px;
       background: var(--border);
       border-bottom: 1px solid var(--border);
       flex-shrink: 0;
     }
 
-    .stat-cell { background: var(--surface2); padding: 9px 6px; text-align: center; }
-    .stat-num  { font-size: 19px; font-weight: 700; line-height: 1; }
-    .stat-lbl  { font-size: 9px; text-transform: uppercase; letter-spacing: 0.7px; color: var(--muted); margin-top: 2px; }
-    .stat-confirmed .stat-num { color: var(--red); }
-    .stat-probable  .stat-num { color: var(--orange); }
-    .stat-suspected .stat-num { color: var(--yellow); }
+    .stat-cell {
+      background: var(--surface2);
+      padding: 10px 4px;
+      text-align: center;
+      transition: background 0.15s;
+    }
+    .stat-cell:hover { background: #1c2a42; }
+
+    .stat-num {
+      font-size: 20px; font-weight: 700; line-height: 1;
+      font-variant-numeric: tabular-nums;
+    }
+    .stat-lbl {
+      font-size: 8.5px; text-transform: uppercase; letter-spacing: 0.8px;
+      color: var(--muted); margin-top: 3px;
+    }
+
+    .stat-confirmed .stat-num  { color: var(--red); }
+    .stat-suspected .stat-num  { color: var(--orange); }
+    .stat-deceased  .stat-num  { color: var(--purple); }
+    .stat-monitoring .stat-num { color: var(--sky); }
 
     /* ── Sidebar body ── */
     #sidebar-body {
       flex: 1; overflow-y: auto;
-      padding: 14px 14px 20px;
-      display: flex; flex-direction: column; gap: 16px;
+      padding: 16px 16px 24px;
+      display: flex; flex-direction: column; gap: 18px;
     }
 
     #sidebar-body::-webkit-scrollbar { width: 4px; }
@@ -121,31 +139,41 @@
 
     .section-title {
       font-size: 10px; font-weight: 600;
-      text-transform: uppercase; letter-spacing: 1px;
-      color: var(--muted); margin-bottom: 8px;
-      display: flex; align-items: center; gap: 6px;
+      text-transform: uppercase; letter-spacing: 1.2px;
+      color: var(--muted); margin-bottom: 10px;
+      display: flex; align-items: center; gap: 8px;
     }
-    .section-title::after { content:''; flex:1; height:1px; background: var(--border); }
+    .section-title::after {
+      content: ''; flex: 1; height: 1px; background: var(--border);
+    }
 
     #disclaimer {
-      background: rgba(239,68,68,0.08);
-      border: 1px solid rgba(239,68,68,0.3);
+      background: rgba(239,68,68,0.07);
+      border: 1px solid rgba(239,68,68,0.25);
       border-radius: 8px; padding: 10px 12px;
-      font-size: 11px; line-height: 1.5; color: #fca5a5;
+      font-size: 11px; line-height: 1.55; color: #fca5a5;
     }
     #disclaimer strong { color: #f87171; display: block; margin-bottom: 3px; }
 
+    /* ── Filter controls ── */
     .filter-group { display: flex; flex-direction: column; gap: 6px; }
-    .filter-label { font-size: 11px; color: var(--muted); font-weight: 500; }
+    .filter-label {
+      font-size: 11px; color: var(--muted); font-weight: 500;
+      margin-bottom: 2px;
+    }
 
     .checkbox-row {
-      display: flex; align-items: center; gap: 8px;
-      padding: 6px 8px; border-radius: 6px;
-      cursor: pointer; transition: background 0.15s; font-size: 13px;
-      min-height: 36px;
+      display: flex; align-items: center; gap: 9px;
+      padding: 7px 9px; border-radius: 7px;
+      cursor: pointer; transition: background 0.15s;
+      font-size: 13px; min-height: 36px;
+      user-select: none;
     }
     .checkbox-row:hover { background: var(--surface2); }
-    .checkbox-row input[type=checkbox] { width: 16px; height: 16px; accent-color: var(--accent); cursor: pointer; flex-shrink: 0; }
+    .checkbox-row input[type=checkbox] {
+      width: 15px; height: 15px; accent-color: var(--accent);
+      cursor: pointer; flex-shrink: 0;
+    }
 
     .dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
 
@@ -153,30 +181,41 @@
       width: 100%;
       background: var(--surface2); border: 1px solid var(--border);
       color: var(--text); font-size: 13px;
-      padding: 8px 10px; border-radius: 6px; outline: none;
-      transition: border-color 0.15s;
+      padding: 8px 10px; border-radius: 7px; outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s;
       min-height: 38px;
+      -webkit-appearance: none;
     }
-    select:focus, input[type=date]:focus { border-color: var(--accent); }
+    select:focus, input[type=date]:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(59,130,246,0.15);
+    }
 
-    .date-row { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+    .date-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 
     .btn-reset {
-      width: 100%; padding: 8px;
+      width: 100%; padding: 9px;
       background: var(--surface2); border: 1px solid var(--border);
-      color: var(--muted); font-size: 12px; border-radius: 6px;
+      color: var(--muted); font-size: 12px; border-radius: 7px;
       cursor: pointer; transition: all 0.15s; font-weight: 500;
       min-height: 36px;
     }
     .btn-reset:hover { background: var(--border); color: var(--text); }
 
-    .legend-item { display: flex; align-items: center; gap: 8px; font-size: 12px; padding: 3px 0; }
+    /* ── Legend ── */
+    .legend-item {
+      display: flex; align-items: center; gap: 9px;
+      font-size: 12px; padding: 3px 0;
+    }
     .legend-dot  { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
-    .legend-line { width: 24px; height: 2px; background: repeating-linear-gradient(90deg,#38bdf8 0,#38bdf8 5px,transparent 5px,transparent 9px); flex-shrink: 0; }
+    .legend-line {
+      width: 24px; height: 2px; flex-shrink: 0;
+      background: repeating-linear-gradient(90deg,#06b6d4 0,#06b6d4 5px,transparent 5px,transparent 9px);
+    }
     .legend-pulse {
       width: 12px; height: 12px; border-radius: 50%;
-      background: rgba(239,68,68,0.5); border: 2px solid #ef4444; flex-shrink: 0;
-      animation: pulse-legend 1.5s ease-out infinite;
+      background: rgba(239,68,68,0.45); border: 2px solid #ef4444; flex-shrink: 0;
+      animation: pulse-legend 1.8s ease-out infinite;
     }
     @keyframes pulse-legend {
       0%   { box-shadow: 0 0 0 0 rgba(239,68,68,0.6); }
@@ -184,6 +223,7 @@
       100% { box-shadow: 0 0 0 0 rgba(239,68,68,0); }
     }
 
+    /* ── Last updated / sources ── */
     #last-updated { font-size: 12px; color: var(--cyan); font-weight: 500; }
 
     .source-row {
@@ -194,213 +234,364 @@
     .source-row:last-child { border-bottom: none; }
     .source-name { color: var(--text); font-weight: 500; }
     .source-time { color: var(--muted); }
-    .source-dot  { width: 6px; height: 6px; border-radius: 50%; background: var(--green); flex-shrink: 0; }
+    .source-dot  { width: 6px; height: 6px; border-radius: 50%; background: #22c55e; flex-shrink: 0; }
 
     .ext-link {
-      display: flex; align-items: center; gap: 6px;
-      padding: 7px 8px; border-radius: 6px;
+      display: flex; align-items: center; gap: 7px;
+      padding: 8px 9px; border-radius: 7px;
       font-size: 12px; color: var(--accent); text-decoration: none;
       transition: background 0.15s; min-height: 36px;
     }
     .ext-link:hover { background: var(--surface2); color: var(--cyan); }
 
     #sidebar-footer {
-      padding: 10px 14px; border-top: 1px solid var(--border);
+      padding: 10px 16px; border-top: 1px solid var(--border);
       font-size: 10px; color: var(--muted); flex-shrink: 0;
       display: flex; justify-content: space-between; align-items: center;
+      gap: 8px;
     }
+    #sidebar-footer a { color: var(--muted); text-decoration: none; }
+    #sidebar-footer a:hover { color: var(--text); }
 
-    /* ── Map container ── */
-    #map-container {
+    /* ── Map container (desktop) ── */
+    #map-wrapper {
       flex: 1; min-width: 0;
-      position: relative; height: 100vh; height: 100dvh;
+      position: relative;
     }
 
-    #map { position: absolute; inset: 0; width: 100%; height: 100%; }
-
-    /* ── Staleness banner ── */
-    #staleness-warning {
-      display: none; position: fixed;
-      top: 0; left: 0; right: 0; z-index: 9999;
-      background: linear-gradient(90deg, #92400e, #b45309);
-      color: #fef3c7; text-align: center;
-      padding: 8px 16px; font-size: 12px; font-weight: 600;
+    #map {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
     }
-    #staleness-warning.visible { display: block; }
 
-    /* ── Map overlay ── */
+    /* ── Map overlays ── */
     #map-overlay-top {
       position: absolute; top: 12px; right: 12px;
       z-index: 1000; pointer-events: none;
     }
 
     .map-badge {
-      background: rgba(10,14,26,0.88);
+      background: rgba(8,12,20,0.88);
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
       border: 1px solid var(--border);
-      border-radius: 8px; padding: 7px 12px;
+      border-radius: 8px; padding: 7px 13px;
       font-size: 11px; color: var(--text);
       pointer-events: auto; white-space: nowrap;
     }
     .map-badge strong { color: var(--cyan); }
 
-    /* ── Pulse marker ── */
-    @keyframes pulse-ring-anim {
-      0%   { transform: scale(1); opacity: 0.8; }
-      70%  { transform: scale(2.5); opacity: 0; }
-      100% { transform: scale(2.5); opacity: 0; }
+    /* ── Staleness banner ── */
+    #staleness-warning {
+      display: none;
+      position: fixed; top: 0; left: 0; right: 0; z-index: 9999;
+      background: linear-gradient(90deg, #92400e, #b45309);
+      color: #fef3c7; text-align: center;
+      padding: 8px 16px; font-size: 12px; font-weight: 600;
     }
-    .pulse-marker { width: 14px; height: 14px; border-radius: 50%; position: relative; }
+    #staleness-warning.visible { display: block; }
+
+    /* ── Pulse marker animation ── */
+    @keyframes pulse-ring {
+      0%   { transform: scale(1); opacity: 0.9; }
+      70%  { transform: scale(2.8); opacity: 0; }
+      100% { transform: scale(2.8); opacity: 0; }
+    }
+    .pulse-marker {
+      width: 14px; height: 14px; border-radius: 50%;
+      position: relative;
+    }
     .pulse-marker::after {
       content: ''; position: absolute; inset: -3px;
       border-radius: 50%; border: 2px solid currentColor;
-      animation: pulse-ring-anim 1.8s ease-out infinite;
+      animation: pulse-ring 1.8s ease-out infinite;
     }
 
-    /* ── Leaflet dark theme ── */
+    /* ── Leaflet dark theme overrides ── */
     .leaflet-popup-content-wrapper {
-      background: #111827 !important; border: 1px solid #1e2d45 !important;
-      border-radius: 10px !important; box-shadow: 0 8px 32px rgba(0,0,0,0.6) !important;
+      background: #0f1623 !important;
+      border: 1px solid #1e3050 !important;
+      border-radius: 10px !important;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.7) !important;
       color: #e2e8f0 !important;
     }
-    .leaflet-popup-tip { background: #111827 !important; }
-    .leaflet-popup-close-button { color: #64748b !important; font-size: 18px !important; top: 6px !important; right: 8px !important; }
+    .leaflet-popup-tip { background: #0f1623 !important; }
+    .leaflet-popup-close-button {
+      color: #64748b !important; font-size: 18px !important;
+      top: 6px !important; right: 8px !important;
+    }
     .leaflet-popup-close-button:hover { color: #e2e8f0 !important; }
     .leaflet-tooltip {
-      background: rgba(10,14,26,0.92) !important; border: 1px solid var(--border) !important;
-      color: var(--text) !important; font-size: 11px !important;
-      border-radius: 6px !important; box-shadow: 0 4px 12px rgba(0,0,0,0.4) !important;
+      background: rgba(8,12,20,0.93) !important;
+      border: 1px solid #1e3050 !important;
+      color: #e2e8f0 !important; font-size: 11px !important;
+      border-radius: 6px !important;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.5) !important;
     }
-    .leaflet-tooltip-top::before { border-top-color: var(--border) !important; }
-    .marker-cluster-small, .marker-cluster-medium, .marker-cluster-large {
-      background: rgba(59,130,246,0.15) !important; border: 2px solid rgba(59,130,246,0.5) !important;
+    .leaflet-tooltip-top::before { border-top-color: #1e3050 !important; }
+    .marker-cluster-small,
+    .marker-cluster-medium,
+    .marker-cluster-large {
+      background: rgba(59,130,246,0.12) !important;
+      border: 2px solid rgba(59,130,246,0.45) !important;
     }
-    .marker-cluster-small div, .marker-cluster-medium div, .marker-cluster-large div {
-      background: rgba(59,130,246,0.3) !important; color: #93c5fd !important;
+    .marker-cluster-small div,
+    .marker-cluster-medium div,
+    .marker-cluster-large div {
+      background: rgba(59,130,246,0.25) !important;
+      color: #93c5fd !important;
       font-weight: 700 !important; font-size: 12px !important;
     }
 
     /* ═══════════════════════════════════════════════════════════════
-       MOBILE LAYOUT  (< 768px)
-       - Map fills full screen
-       - Floating header bar at top
-       - Bottom drawer (peek + full open)
+       CASE DETAIL PANEL
+    ═══════════════════════════════════════════════════════════════ */
+    #case-panel {
+      position: fixed;
+      top: 0; right: 0; bottom: 0;
+      width: 360px;
+      background: var(--surface);
+      border-left: 1px solid var(--border);
+      z-index: 2000;
+      display: flex; flex-direction: column;
+      transform: translateX(100%);
+      transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
+      box-shadow: -8px 0 40px rgba(0,0,0,0.6);
+      overflow: hidden;
+    }
+    #case-panel.open { transform: translateX(0); }
+
+    #case-panel-header {
+      padding: 16px 18px;
+      background: linear-gradient(160deg, #080c14 0%, #0d1a3a 100%);
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: flex-start; gap: 12px;
+      flex-shrink: 0;
+    }
+    #case-panel-header .panel-title-block { flex: 1; min-width: 0; }
+    #case-panel-header .panel-case-num {
+      font-size: 11px; color: var(--muted); font-weight: 500;
+      text-transform: uppercase; letter-spacing: 0.8px;
+    }
+    #case-panel-header .panel-location {
+      font-size: 16px; font-weight: 700; color: #f1f5f9;
+      margin-top: 3px; line-height: 1.3;
+    }
+    #case-panel-header .panel-status-badge {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 3px 9px; border-radius: 20px;
+      font-size: 11px; font-weight: 600;
+      margin-top: 6px;
+    }
+
+    #case-panel-close {
+      background: none; border: none; cursor: pointer;
+      color: var(--muted); font-size: 20px; line-height: 1;
+      padding: 2px 4px; border-radius: 4px;
+      transition: color 0.15s, background 0.15s;
+      flex-shrink: 0;
+    }
+    #case-panel-close:hover { color: var(--text); background: var(--surface2); }
+
+    #case-panel-body {
+      flex: 1; overflow-y: auto; padding: 18px;
+      display: flex; flex-direction: column; gap: 16px;
+    }
+    #case-panel-body::-webkit-scrollbar { width: 4px; }
+    #case-panel-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+    .panel-field {
+      display: flex; flex-direction: column; gap: 3px;
+    }
+    .panel-field-label {
+      font-size: 10px; text-transform: uppercase; letter-spacing: 0.9px;
+      color: var(--muted); font-weight: 600;
+    }
+    .panel-field-value {
+      font-size: 13px; color: var(--text); line-height: 1.5;
+    }
+    .panel-field-value a {
+      color: var(--accent); text-decoration: none;
+    }
+    .panel-field-value a:hover { color: var(--cyan); text-decoration: underline; }
+
+    .panel-divider {
+      height: 1px; background: var(--border); margin: 2px 0;
+    }
+
+    .panel-notes {
+      background: var(--surface2); border-radius: 8px;
+      padding: 12px 14px; font-size: 12px; line-height: 1.65;
+      color: #94a3b8; border: 1px solid var(--border);
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       MOBILE LAYOUT (<768px)
+       CRITICAL: flex column — topbar → map-wrapper → bottom-sheet
+       The map NEVER gets covered.
     ═══════════════════════════════════════════════════════════════ */
     @media (max-width: 767px) {
-      #app { flex-direction: column; }
-
-      /* Sidebar becomes a bottom drawer */
-      #sidebar {
-        position: fixed;
-        bottom: 0; left: 0; right: 0;
-        width: 100%; min-width: unset;
-        height: auto;
-        max-height: 85dvh;
-        border-right: none;
-        border-top: 1px solid var(--border);
-        border-radius: 16px 16px 0 0;
-        transform: translateY(calc(100% - var(--drawer-peek)));
-        z-index: 500;
-        box-shadow: 0 -8px 40px rgba(0,0,0,0.6);
-        transition: transform 0.35s cubic-bezier(0.4,0,0.2,1);
-      }
-
-      #sidebar.drawer-open {
-        transform: translateY(0);
-      }
-
-      /* Drag handle */
-      #sidebar-header {
-        border-radius: 16px 16px 0 0;
-        padding: 0;
-        cursor: pointer;
-        position: relative;
-      }
-
-      #drawer-handle {
+      html, body {
+        height: 100dvh;
         display: flex;
         flex-direction: column;
-        align-items: center;
-        padding: 10px 16px 8px;
-        background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
-        border-radius: 16px 16px 0 0;
-        gap: 8px;
+        overflow: hidden;
       }
 
-      .handle-bar {
+      /* The #app wrapper is not needed on mobile — body IS the flex container */
+      #app {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+        overflow: hidden;
+      }
+
+      /* ── Topbar: fixed height, NOT position:fixed ── */
+      #topbar {
+        height: 56px;
+        flex-shrink: 0;
+        position: relative;
+        background: rgba(8,12,20,0.97);
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        padding: 0 12px;
+        gap: 10px;
+        z-index: 10;
+      }
+
+      .topbar-logo { display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0; }
+      .topbar-logo-icon {
+        width: 30px; height: 30px;
+        background: radial-gradient(circle at 35% 35%, #ef4444 0%, #7f1d1d 100%);
+        border-radius: 50%; display: flex; align-items: center; justify-content: center;
+        font-size: 15px; box-shadow: 0 0 12px rgba(239,68,68,0.45); flex-shrink: 0;
+      }
+      .topbar-logo-text h1 {
+        font-size: 13px; font-weight: 700; color: #f1f5f9;
+        white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      }
+      .topbar-logo-text p { font-size: 9.5px; color: #f59e0b; }
+
+      #topbar-stats {
+        display: flex; gap: 10px; flex-shrink: 0;
+      }
+      .topbar-stat { text-align: center; }
+      .topbar-stat-num {
+        font-size: 15px; font-weight: 700; line-height: 1;
+        font-variant-numeric: tabular-nums;
+      }
+      .topbar-stat-lbl {
+        font-size: 8px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted);
+      }
+      .ts-confirmed .topbar-stat-num  { color: var(--red); }
+      .ts-suspected .topbar-stat-num  { color: var(--orange); }
+      .ts-deceased  .topbar-stat-num  { color: var(--purple); }
+      .ts-monitoring .topbar-stat-num { color: var(--sky); }
+
+      /* ── Map wrapper: flex:1, shrinks when sheet expands ── */
+      #map-wrapper {
+        flex: 1;
+        position: relative;
+        min-height: 0;
+      }
+
+      #map {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+      }
+
+      /* ── Bottom sheet: flex-shrink:0, height transitions ── */
+      #bottom-sheet {
+        flex-shrink: 0;
+        background: var(--surface);
+        border-top: 1px solid var(--border);
+        border-radius: 16px 16px 0 0;
+        box-shadow: 0 -6px 30px rgba(0,0,0,0.5);
+        overflow: hidden;
+        /* Collapsed: only handle visible */
+        height: 44px;
+        max-height: 70dvh;
+        transition: height 0.35s cubic-bezier(0.4,0,0.2,1);
+        z-index: 10;
+      }
+
+      #bottom-sheet.expanded {
+        height: 70dvh;
+      }
+
+      .sheet-handle {
+        height: 44px;
+        display: flex; flex-direction: column;
+        align-items: center; justify-content: center;
+        gap: 6px; cursor: pointer;
+        background: linear-gradient(160deg, #0d1220 0%, #0f1a30 100%);
+        flex-shrink: 0;
+        user-select: none;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      .sheet-handle-bar {
         width: 36px; height: 4px;
-        background: rgba(255,255,255,0.2);
+        background: rgba(255,255,255,0.18);
         border-radius: 2px;
       }
 
-      .drawer-header-row {
-        display: flex; align-items: center;
-        justify-content: space-between;
+      .sheet-handle-label {
+        font-size: 11px; font-weight: 600; color: var(--muted);
+        display: flex; align-items: center; gap: 6px;
+      }
+
+      .sheet-chevron {
+        font-size: 10px; color: var(--muted);
+        transition: transform 0.3s;
+        display: inline-block;
+      }
+      #bottom-sheet.expanded .sheet-chevron { transform: rotate(180deg); }
+
+      .sheet-content {
+        overflow-y: auto;
+        height: calc(70dvh - 44px);
+        padding: 14px 16px 24px;
+        display: flex; flex-direction: column; gap: 16px;
+      }
+      .sheet-content::-webkit-scrollbar { width: 3px; }
+      .sheet-content::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+      /* Hide desktop sidebar on mobile */
+      #sidebar { display: none; }
+
+      /* Map overlay position on mobile */
+      #map-overlay-top { top: 10px; right: 10px; }
+
+      /* Case panel on mobile: slides up from bottom */
+      #case-panel {
+        top: auto;
+        left: 0; right: 0; bottom: 0;
         width: 100%;
+        height: 80dvh;
+        border-left: none;
+        border-top: 1px solid var(--border);
+        border-radius: 16px 16px 0 0;
+        transform: translateY(100%);
+        box-shadow: 0 -8px 40px rgba(0,0,0,0.7);
       }
-
-      /* Map fills full screen on mobile */
-      #map-container {
-        position: fixed; inset: 0;
-        height: 100dvh; z-index: 1;
-      }
-
-      /* Floating top bar on mobile */
-      #mobile-topbar {
-        display: flex;
-        position: fixed;
-        top: 0; left: 0; right: 0;
-        z-index: 400;
-        background: rgba(10,14,26,0.92);
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
-        border-bottom: 1px solid var(--border);
-        padding: 0 12px;
-        height: var(--header-h);
-        align-items: center;
-        gap: 10px;
-      }
-
-      .mobile-logo { display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0; }
-      .mobile-logo-icon {
-        width: 28px; height: 28px;
-        background: radial-gradient(circle, #ef4444 0%, #7f1d1d 100%);
-        border-radius: 50%; display: flex; align-items: center; justify-content: center;
-        font-size: 14px; box-shadow: 0 0 10px rgba(239,68,68,0.4); flex-shrink: 0;
-      }
-      .mobile-logo-text { min-width: 0; }
-      .mobile-logo-text h1 { font-size: 13px; font-weight: 700; color: #f1f5f9; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-      .mobile-logo-text p  { font-size: 10px; color: #f59e0b; }
-
-      /* Mobile stats inline */
-      #mobile-stats {
-        display: flex; gap: 8px; flex-shrink: 0;
-      }
-      .mobile-stat { text-align: center; }
-      .mobile-stat-num { font-size: 14px; font-weight: 700; line-height: 1; }
-      .mobile-stat-lbl { font-size: 8px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted); }
-      .ms-confirmed .mobile-stat-num { color: var(--red); }
-      .ms-probable  .mobile-stat-num { color: var(--orange); }
-      .ms-suspected .mobile-stat-num { color: var(--yellow); }
+      #case-panel.open { transform: translateY(0); }
 
       /* Hide desktop stats bar on mobile */
       #stats-bar { display: none; }
 
-      /* Adjust map overlay to not overlap topbar */
-      #map-overlay-top { top: calc(var(--header-h) + 8px); right: 8px; }
-
-      /* Sidebar body scrollable */
-      #sidebar-body { max-height: calc(85dvh - var(--drawer-peek) - 20px); }
-
-      /* Sidebar footer hidden on mobile (info in topbar) */
-      #sidebar-footer { display: none; }
+      /* Staleness banner on mobile */
+      #staleness-warning { font-size: 11px; padding: 6px 12px; }
     }
 
     /* Desktop: hide mobile-only elements */
     @media (min-width: 768px) {
-      #mobile-topbar { display: none; }
-      #drawer-handle  { display: none; }
+      #topbar       { display: none; }
+      #bottom-sheet { display: none; }
     }
   </style>
 </head>
@@ -411,70 +602,71 @@
     ⚠ Data may be outdated — last update was more than 24 hours ago.
   </div>
 
-  <!-- Mobile top bar (hidden on desktop) -->
-  <div id="mobile-topbar" role="banner">
-    <div class="mobile-logo">
-      <div class="mobile-logo-icon" aria-hidden="true">🦠</div>
-      <div class="mobile-logo-text">
+  <!-- ═══════════════════════════════════════════════════════════════
+       MOBILE TOPBAR (hidden on desktop)
+  ═══════════════════════════════════════════════════════════════ -->
+  <div id="topbar" role="banner">
+    <div class="topbar-logo">
+      <div class="topbar-logo-icon" aria-hidden="true">🦠</div>
+      <div class="topbar-logo-text">
         <h1>Hantavirus Tracker</h1>
-        <p>Live Surveillance</p>
+        <p>⚡ Live Surveillance</p>
       </div>
     </div>
-    <div id="mobile-stats" aria-label="Case counts">
-      <div class="mobile-stat ms-confirmed">
-        <div class="mobile-stat-num" id="m-count-confirmed">—</div>
-        <div class="mobile-stat-lbl">Conf.</div>
+    <div id="topbar-stats" aria-label="Case counts">
+      <div class="topbar-stat ts-confirmed">
+        <div class="topbar-stat-num" id="m-count-confirmed">—</div>
+        <div class="topbar-stat-lbl">Conf.</div>
       </div>
-      <div class="mobile-stat ms-probable">
-        <div class="mobile-stat-num" id="m-count-probable">—</div>
-        <div class="mobile-stat-lbl">Prob.</div>
+      <div class="topbar-stat ts-suspected">
+        <div class="topbar-stat-num" id="m-count-suspected">—</div>
+        <div class="topbar-stat-lbl">Susp.</div>
       </div>
-      <div class="mobile-stat ms-suspected">
-        <div class="mobile-stat-num" id="m-count-suspected">—</div>
-        <div class="mobile-stat-lbl">Susp.</div>
+      <div class="topbar-stat ts-deceased">
+        <div class="topbar-stat-num" id="m-count-deceased">—</div>
+        <div class="topbar-stat-lbl">Decd.</div>
+      </div>
+      <div class="topbar-stat ts-monitoring">
+        <div class="topbar-stat-num" id="m-count-monitoring">—</div>
+        <div class="topbar-stat-lbl">Mon.</div>
       </div>
     </div>
   </div>
 
+  <!-- ═══════════════════════════════════════════════════════════════
+       MAIN APP WRAPPER
+  ═══════════════════════════════════════════════════════════════ -->
   <div id="app">
 
-    <!-- ── Sidebar / Bottom Drawer ── -->
+    <!-- ── Desktop Sidebar ── -->
     <aside id="sidebar" role="complementary" aria-label="Tracker controls">
 
-      <!-- Desktop header / Mobile drag handle -->
-      <div id="sidebar-header" onclick="toggleDrawer()">
-        <!-- Mobile handle (hidden on desktop via CSS) -->
-        <div id="drawer-handle">
-          <div class="handle-bar" aria-hidden="true"></div>
-          <div class="drawer-header-row">
-            <span style="font-size:12px;font-weight:600;color:#f1f5f9;">Filters &amp; Info</span>
-            <span id="drawer-chevron" style="font-size:14px;color:var(--muted);transition:transform 0.3s;">▲</span>
-          </div>
-        </div>
-        <!-- Desktop header (hidden on mobile via CSS) -->
-        <div style="padding:16px 16px 12px;">
-          <div class="logo-row">
-            <div class="logo-icon" aria-hidden="true">🦠</div>
-            <div class="logo-text">
-              <h1>Hantavirus Tracker</h1>
-              <p>⚡ Live Global Surveillance</p>
-            </div>
+      <div id="sidebar-header">
+        <div class="logo-row">
+          <div class="logo-icon" aria-hidden="true">🦠</div>
+          <div class="logo-text">
+            <h1>Hantavirus Tracker</h1>
+            <p>⚡ Live Global Surveillance</p>
           </div>
         </div>
       </div>
 
-      <!-- Desktop stats bar -->
+      <!-- Stats bar: 4 cells -->
       <div id="stats-bar" aria-label="Case counts">
         <div class="stat-cell stat-confirmed">
           <div class="stat-num" id="count-confirmed">—</div>
           <div class="stat-lbl">Confirmed</div>
         </div>
-        <div class="stat-cell stat-probable">
-          <div class="stat-num" id="count-deceased" style="color:#a78bfa;">—</div>
+        <div class="stat-cell stat-suspected">
+          <div class="stat-num" id="count-suspected">—</div>
+          <div class="stat-lbl">Suspected</div>
+        </div>
+        <div class="stat-cell stat-deceased">
+          <div class="stat-num" id="count-deceased">—</div>
           <div class="stat-lbl">Deceased</div>
         </div>
-        <div class="stat-cell stat-suspected">
-          <div class="stat-num" id="count-monitoring" style="color:#38bdf8;">—</div>
+        <div class="stat-cell stat-monitoring">
+          <div class="stat-num" id="count-monitoring">—</div>
           <div class="stat-lbl">Monitoring</div>
         </div>
       </div>
@@ -482,7 +674,7 @@
       <!-- Scrollable body -->
       <div id="sidebar-body">
 
-        <div id="disclaimer" role="note" aria-label="Medical disclaimer">
+        <div id="disclaimer" role="note">
           <strong>⚠ Medical Disclaimer</strong>
           For informational purposes only. Data may be incomplete or delayed.
           Consult a healthcare professional for medical advice.
@@ -495,13 +687,31 @@
 
         <section aria-labelledby="legend-heading">
           <div class="section-title" id="legend-heading">Legend</div>
-          <div style="display:flex;flex-direction:column;gap:6px;">
-            <div class="legend-item"><div class="legend-dot" style="background:#ef4444;" aria-hidden="true"></div><span>Confirmed</span></div>
-            <div class="legend-item"><div class="legend-dot" style="background:#f97316;" aria-hidden="true"></div><span>Suspected</span></div>
-            <div class="legend-item"><div class="legend-dot" style="background:#7c3aed;" aria-hidden="true"></div><span>Deceased</span></div>
-            <div class="legend-item"><div class="legend-dot" style="background:#0ea5e9;" aria-hidden="true"></div><span>Monitoring</span></div>
-            <div class="legend-item"><div class="legend-pulse" aria-hidden="true"></div><span>Andes virus (pulsing)</span></div>
-            <div class="legend-item"><div class="legend-line" aria-hidden="true"></div><span>MV Hondius route</span></div>
+          <div style="display:flex;flex-direction:column;gap:7px;">
+            <div class="legend-item">
+              <div class="legend-dot" style="background:var(--red);" aria-hidden="true"></div>
+              <span>Confirmed</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-dot" style="background:var(--orange);" aria-hidden="true"></div>
+              <span>Suspected</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-dot" style="background:var(--purple);" aria-hidden="true"></div>
+              <span>Deceased</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-dot" style="background:var(--sky);" aria-hidden="true"></div>
+              <span>Monitoring</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-pulse" aria-hidden="true"></div>
+              <span>Andes virus (pulsing)</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-line" aria-hidden="true"></div>
+              <span>MV Hondius route</span>
+            </div>
           </div>
         </section>
 
@@ -513,36 +723,163 @@
         <section aria-labelledby="sources-heading">
           <div class="section-title" id="sources-heading">Data Sources</div>
           <div id="source-timestamps" aria-live="polite">
-            <div class="source-row"><span class="source-name">Loading…</span></div>
+            <div class="source-row"><span class="source-name" style="color:var(--muted);">Loading…</span></div>
           </div>
         </section>
 
         <section aria-labelledby="links-heading">
           <div class="section-title" id="links-heading">Official Sources</div>
           <div style="display:flex;flex-direction:column;gap:2px;">
-            <a class="ext-link" href="https://www.who.int/emergencies/disease-outbreak-news" target="_blank" rel="noopener">🌐 WHO Disease Outbreak News ↗</a>
-            <a class="ext-link" href="https://www.cdc.gov/hantavirus/" target="_blank" rel="noopener">🇺🇸 CDC Hantavirus ↗</a>
-            <a class="ext-link" href="https://www.ecdc.europa.eu/en/hantavirus-infection" target="_blank" rel="noopener">🇪🇺 ECDC Hantavirus ↗</a>
+            <a class="ext-link" href="https://www.arcgis.com/apps/dashboards/5c68442d2afc42d7ba2696e4cd393729" target="_blank" rel="noopener">
+              📊 ANDV Hantavirus 2026 Dashboard ↗
+            </a>
+            <a class="ext-link" href="https://www.who.int/emergencies/disease-outbreak-news" target="_blank" rel="noopener">
+              🌐 WHO Disease Outbreak News ↗
+            </a>
+            <a class="ext-link" href="https://www.cdc.gov/hantavirus/" target="_blank" rel="noopener">
+              🇺🇸 CDC Hantavirus ↗
+            </a>
+            <a class="ext-link" href="https://www.ecdc.europa.eu/en/hantavirus-infection" target="_blank" rel="noopener">
+              🇪🇺 ECDC Hantavirus ↗
+            </a>
           </div>
         </section>
 
-      </div>
+      </div><!-- /sidebar-body -->
 
       <div id="sidebar-footer">
-        <span>Updates every 4h · Not for clinical use</span>
-        <a href="https://github.com/EliseyRotar/hantavirus-tracker" target="_blank" rel="noopener" style="color:var(--muted);text-decoration:none;">GitHub ↗</a>
+        <span>Data: ANDV Hantavirus 2026 Dashboard (ArcGIS) · K. Panozzo, University of Toledo</span>
+        <a href="https://github.com/EliseyRotar/hantavirus-tracker" target="_blank" rel="noopener">GitHub ↗</a>
       </div>
 
-    </aside>
+    </aside><!-- /sidebar -->
 
-    <!-- ── Map ── -->
-    <main id="map-container" style="flex:1;min-width:0;position:relative;height:100vh;height:100dvh;">
+    <!-- ── Map wrapper ── -->
+    <div id="map-wrapper">
       <div id="map-overlay-top">
         <div class="map-badge"><strong id="visible-count">—</strong> cases visible</div>
       </div>
       <div id="map" role="application" aria-label="Live hantavirus case map" tabindex="0"></div>
-    </main>
+    </div>
 
+  </div><!-- /app -->
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       MOBILE BOTTOM SHEET (hidden on desktop)
+  ═══════════════════════════════════════════════════════════════ -->
+  <div id="bottom-sheet" role="complementary" aria-label="Filters and information">
+    <div class="sheet-handle" id="sheet-handle-btn" role="button" tabindex="0"
+         aria-expanded="false" aria-controls="sheet-body"
+         onclick="toggleSheet()" onkeydown="if(event.key==='Enter'||event.key===' ')toggleSheet()">
+      <div class="sheet-handle-bar" aria-hidden="true"></div>
+      <div class="sheet-handle-label">
+        <span id="sheet-label-text">Filters &amp; Info</span>
+        <span class="sheet-chevron" aria-hidden="true">▲</span>
+      </div>
+    </div>
+    <div class="sheet-content" id="sheet-body" aria-hidden="true">
+
+      <section aria-labelledby="m-filters-heading">
+        <div class="section-title" id="m-filters-heading">Filters</div>
+        <div id="m-filter-controls" class="filter-group"></div>
+      </section>
+
+      <section aria-labelledby="m-legend-heading">
+        <div class="section-title" id="m-legend-heading">Legend</div>
+        <div style="display:flex;flex-direction:column;gap:7px;">
+          <div class="legend-item">
+            <div class="legend-dot" style="background:var(--red);" aria-hidden="true"></div>
+            <span>Confirmed</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-dot" style="background:var(--orange);" aria-hidden="true"></div>
+            <span>Suspected</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-dot" style="background:var(--purple);" aria-hidden="true"></div>
+            <span>Deceased</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-dot" style="background:var(--sky);" aria-hidden="true"></div>
+            <span>Monitoring</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-pulse" aria-hidden="true"></div>
+            <span>Andes virus (pulsing)</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-line" aria-hidden="true"></div>
+            <span>MV Hondius route</span>
+          </div>
+        </div>
+      </section>
+
+      <section aria-labelledby="m-updated-heading">
+        <div class="section-title" id="m-updated-heading">Last Updated</div>
+        <div id="m-last-updated" aria-live="polite" style="font-size:12px;color:var(--cyan);font-weight:500;">Loading…</div>
+      </section>
+
+      <section aria-labelledby="m-sources-heading">
+        <div class="section-title" id="m-sources-heading">Official Sources</div>
+        <div style="display:flex;flex-direction:column;gap:2px;">
+          <a class="ext-link" href="https://www.arcgis.com/apps/dashboards/5c68442d2afc42d7ba2696e4cd393729" target="_blank" rel="noopener">
+            📊 ANDV Hantavirus 2026 Dashboard ↗
+          </a>
+          <a class="ext-link" href="https://www.who.int/emergencies/disease-outbreak-news" target="_blank" rel="noopener">
+            🌐 WHO Disease Outbreak News ↗
+          </a>
+        </div>
+      </section>
+
+      <div style="font-size:10px;color:var(--muted);padding-top:4px;line-height:1.5;">
+        Data: ANDV Hantavirus 2026 Dashboard (ArcGIS) · K. Panozzo, University of Toledo
+      </div>
+
+    </div><!-- /sheet-content -->
+  </div><!-- /bottom-sheet -->
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       CASE DETAIL PANEL
+  ═══════════════════════════════════════════════════════════════ -->
+  <div id="case-panel" role="dialog" aria-modal="true" aria-label="Case details" aria-hidden="true">
+    <div id="case-panel-header">
+      <div class="panel-title-block">
+        <div class="panel-case-num" id="cp-case-num">Case #—</div>
+        <div class="panel-location" id="cp-location">—</div>
+        <div id="cp-status-badge" class="panel-status-badge"></div>
+      </div>
+      <button id="case-panel-close" aria-label="Close case details" onclick="closeCasePanel()">✕</button>
+    </div>
+    <div id="case-panel-body">
+      <div class="panel-field">
+        <div class="panel-field-label">📍 Location</div>
+        <div class="panel-field-value" id="cp-location-detail">—</div>
+      </div>
+      <div class="panel-divider"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+        <div class="panel-field">
+          <div class="panel-field-label">📅 Onset Date</div>
+          <div class="panel-field-value" id="cp-date">—</div>
+        </div>
+        <div class="panel-field">
+          <div class="panel-field-label">👤 Age / Sex</div>
+          <div class="panel-field-value" id="cp-age-sex">—</div>
+        </div>
+      </div>
+      <div class="panel-field">
+        <div class="panel-field-label">🏷 Exposure Group</div>
+        <div class="panel-field-value" id="cp-exposure">—</div>
+      </div>
+      <div class="panel-divider"></div>
+      <div class="panel-field">
+        <div class="panel-field-label">📋 Details</div>
+        <div class="panel-notes" id="cp-notes">—</div>
+      </div>
+      <div class="panel-field">
+        <div class="panel-field-label">🔗 Source</div>
+        <div class="panel-field-value" id="cp-source">—</div>
+      </div>
+    </div>
   </div>
 
   <!-- Leaflet JS -->
@@ -550,43 +887,95 @@
   <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js" crossorigin=""></script>
 
   <script>
-    // ── Drawer toggle ──────────────────────────────────────────────
-    var drawerOpen = false;
-    function toggleDrawer() {
-      if (window.innerWidth >= 768) return;
-      drawerOpen = !drawerOpen;
-      var sidebar  = document.getElementById('sidebar');
-      var chevron  = document.getElementById('drawer-chevron');
-      if (drawerOpen) {
-        sidebar.classList.add('drawer-open');
-        if (chevron) chevron.style.transform = 'rotate(180deg)';
+    /* ── Bottom sheet toggle ── */
+    var sheetOpen = false;
+    function toggleSheet() {
+      sheetOpen = !sheetOpen;
+      var sheet = document.getElementById('bottom-sheet');
+      var body  = document.getElementById('sheet-body');
+      var btn   = document.getElementById('sheet-handle-btn');
+      if (sheetOpen) {
+        sheet.classList.add('expanded');
+        if (body)  body.setAttribute('aria-hidden', 'false');
+        if (btn)   btn.setAttribute('aria-expanded', 'true');
       } else {
-        sidebar.classList.remove('drawer-open');
-        if (chevron) chevron.style.transform = '';
+        sheet.classList.remove('expanded');
+        if (body)  body.setAttribute('aria-hidden', 'true');
+        if (btn)   btn.setAttribute('aria-expanded', 'false');
+      }
+      /* Invalidate map size so it fills the new space */
+      if (window.mapState && window.mapState.map) {
+        setTimeout(function () { window.mapState.map.invalidateSize(); }, 360);
       }
     }
 
-    // Close drawer when tapping the map
-    document.addEventListener('DOMContentLoaded', function () {
-      var mapEl = document.getElementById('map');
-      if (mapEl) {
-        mapEl.addEventListener('click', function () {
-          if (drawerOpen && window.innerWidth < 768) {
-            drawerOpen = false;
-            document.getElementById('sidebar').classList.remove('drawer-open');
-            var ch = document.getElementById('drawer-chevron');
-            if (ch) ch.style.transform = '';
-          }
-        });
+    /* ── Case panel ── */
+    function openCasePanel(data) {
+      var panel = document.getElementById('case-panel');
+      if (!panel) return;
+
+      /* Populate fields */
+      var setEl = function(id, val) {
+        var el = document.getElementById(id);
+        if (el) el.textContent = val || '—';
+      };
+
+      setEl('cp-case-num',  'Case #' + (data.case_id || '—'));
+      setEl('cp-location',  data.location_name || '—');
+      setEl('cp-location-detail', data.location_name || '—');
+      setEl('cp-date',      data.date_formatted || '—');
+      setEl('cp-age-sex',   data.age_sex || '—');
+      setEl('cp-exposure',  data.exposure_group || '—');
+      setEl('cp-notes',     data.notes || 'No additional details.');
+
+      /* Status badge */
+      var badge = document.getElementById('cp-status-badge');
+      if (badge) {
+        var colors = {
+          confirmed:  { bg: 'rgba(239,68,68,0.15)',  border: 'rgba(239,68,68,0.4)',  text: '#ef4444' },
+          suspected:  { bg: 'rgba(249,115,22,0.15)', border: 'rgba(249,115,22,0.4)', text: '#f97316' },
+          deceased:   { bg: 'rgba(139,92,246,0.15)', border: 'rgba(139,92,246,0.4)', text: '#8b5cf6' },
+          monitoring: { bg: 'rgba(14,165,233,0.15)', border: 'rgba(14,165,233,0.4)', text: '#0ea5e9' },
+        };
+        var key = (data.status || '').toLowerCase();
+        var c = colors[key] || { bg: 'rgba(100,116,139,0.15)', border: 'rgba(100,116,139,0.4)', text: '#94a3b8' };
+        badge.style.cssText = 'background:' + c.bg + ';border:1px solid ' + c.border + ';color:' + c.text + ';';
+        badge.textContent = data.status || '—';
       }
+
+      /* Source link */
+      var srcEl = document.getElementById('cp-source');
+      if (srcEl) {
+        if (data.source && data.source.startsWith('http')) {
+          srcEl.innerHTML = '<a href="' + data.source.replace(/"/g,'&quot;') + '" target="_blank" rel="noopener">View source ↗</a>';
+        } else {
+          srcEl.textContent = data.source || '—';
+        }
+      }
+
+      panel.classList.add('open');
+      panel.setAttribute('aria-hidden', 'false');
+      document.getElementById('case-panel-close').focus();
+    }
+
+    function closeCasePanel() {
+      var panel = document.getElementById('case-panel');
+      if (!panel) return;
+      panel.classList.remove('open');
+      panel.setAttribute('aria-hidden', 'true');
+    }
+
+    /* Close panel on Escape */
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') closeCasePanel();
     });
 
-    // Sync mobile stat counts
-    window.updateMobileStats = function (counts) {
-      ['confirmed','probable','suspected'].forEach(function (s) {
-        var el = document.getElementById('m-count-' + s);
-        if (el && counts[s[0].toUpperCase() + s.slice(1)] !== undefined)
-          el.textContent = counts[s[0].toUpperCase() + s.slice(1)];
+    /* ── Mobile stats update ── */
+    window.updateMobileStats = function(counts) {
+      var map = { confirmed: 'Confirmed', suspected: 'Suspected', deceased: 'Deceased', monitoring: 'Monitoring' };
+      Object.entries(map).forEach(function(e) {
+        var el = document.getElementById('m-count-' + e[0]);
+        if (el) el.textContent = (counts[e[1]] !== undefined) ? counts[e[1]] : '—';
       });
     };
   </script>

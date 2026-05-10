@@ -1,14 +1,16 @@
 /**
- * ui.js — UI updates: timestamps, staleness, source panel.
+ * ui.js — UI updates: timestamps, staleness banner, source panel.
+ * v2.0 — updates both desktop sidebar and mobile bottom sheet.
  */
 (function () {
   'use strict';
 
-  window.isStale = function (ts) {
-    if (!ts) return false;
-    var d = new Date(ts);
-    return !isNaN(d) && (Date.now() - d.getTime()) > 86400000;
-  };
+  /* ── Helpers ── */
+  function esc(s) {
+    return String(s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
 
   function relTime(ts) {
     if (!ts) return '';
@@ -25,22 +27,29 @@
   function fmtDate(ts) {
     if (!ts) return '—';
     var d = new Date(ts);
-    if (isNaN(d)) return ts;
-    return d.toLocaleString('en-GB', { day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' });
+    if (isNaN(d)) return String(ts);
+    return d.toLocaleString('en-GB', {
+      day: '2-digit', month: 'short', year: 'numeric',
+      hour: '2-digit', minute: '2-digit',
+    });
   }
 
-  function esc(s) {
-    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-  }
+  window.isStale = function (ts) {
+    if (!ts) return false;
+    var d = new Date(ts);
+    return !isNaN(d) && (Date.now() - d.getTime()) > 86400000;
+  };
 
+  /* ── Last updated ── */
   function updateLastUpdated(ts) {
-    var el = document.getElementById('last-updated');
-    if (!el) return;
-    if (!ts) { el.textContent = 'Unknown'; return; }
-    el.textContent = fmtDate(ts) + ' (' + (relTime(ts) || '—') + ')';
-    el.title = ts;
+    var text = ts ? fmtDate(ts) + ' (' + (relTime(ts) || '—') + ')' : 'Unknown';
+    ['last-updated', 'm-last-updated'].forEach(function (id) {
+      var el = document.getElementById(id);
+      if (el) { el.textContent = text; el.title = ts || ''; }
+    });
   }
 
+  /* ── Source timestamps (desktop sidebar only) ── */
   function updateSources(sourceTimestamps) {
     var el = document.getElementById('source-timestamps');
     if (!el) return;
@@ -53,27 +62,26 @@
       var rel = relTime(ts);
       return '<div class="source-row">' +
         '<div style="display:flex;align-items:center;gap:6px;">' +
-        '<div class="source-dot"></div>' +
-        '<span class="source-name">' + esc(id) + '</span></div>' +
+          '<div class="source-dot"></div>' +
+          '<span class="source-name">' + esc(id) + '</span>' +
+        '</div>' +
         '<span class="source-time" title="' + esc(ts) + '">' + esc(rel || fmtDate(ts)) + '</span>' +
         '</div>';
     }).join('');
   }
 
+  /* ── Staleness banner ── */
   function updateStaleness(ts) {
     var banner = document.getElementById('staleness-warning');
     if (!banner) return;
     if (window.isStale(ts)) {
       banner.classList.add('visible');
-      var app = document.getElementById('app');
-      if (app) app.style.paddingTop = banner.offsetHeight + 'px';
     } else {
       banner.classList.remove('visible');
-      var app2 = document.getElementById('app');
-      if (app2) app2.style.paddingTop = '';
     }
   }
 
+  /* ── Listen for data loaded event ── */
   document.addEventListener('geojsonloaded', function (e) {
     var meta = ((e && e.detail) || {}).metadata || {};
     updateLastUpdated(meta.generated_at);
