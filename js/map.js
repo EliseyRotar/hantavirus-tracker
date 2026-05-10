@@ -1,328 +1,222 @@
 /**
- * map.js — Leaflet map initialization, marker rendering, and overlays
- * for the Live Hantavirus Global Tracker.
- *
- * Exports (on window):
- *   window.mapState  — { allFeatures, clusterGroup, map }
- *   window.renderMarkers(features) — clears and re-renders markers
+ * map.js — Leaflet map for the Live Hantavirus Global Tracker.
+ * Dark tile layer, styled markers, MV Hondius route, cluster group.
  */
-
 (function () {
   'use strict';
 
-  // ---------------------------------------------------------------------------
-  // Shared state — consumed by filters.js and ui.js
-  // ---------------------------------------------------------------------------
-  window.mapState = {
-    allFeatures: [],
-    clusterGroup: null,
-    map: null,
-  };
+  window.mapState = { allFeatures: [], clusterGroup: null, map: null };
 
-  // ---------------------------------------------------------------------------
-  // MV Hondius voyage route coordinates [lat, lon]
-  // Ushuaia → Falklands → South Georgia → Ascension → Saint Helena →
-  // São Tomé → Cape Verde → Canary Islands
-  // ---------------------------------------------------------------------------
   const MV_HONDIUS_ROUTE = [
-    [-54.8, -68.3],
-    [-51.7, -59.0],
-    [-54.2, -36.5],
-    [-37.1, -12.3],
-    [-15.9,  -5.7],
-    [ -7.9, -14.4],
-    [ 14.9, -23.5],
-    [ 28.1, -15.4],
+    [-54.8, -68.3], [-51.7, -59.0], [-54.2, -36.5],
+    [-37.1, -12.3], [-15.9,  -5.7], [ -7.9, -14.4],
+    [ 14.9, -23.5], [ 28.1, -15.4],
   ];
 
-  // ---------------------------------------------------------------------------
-  // Marker color helpers
-  // ---------------------------------------------------------------------------
   const STATUS_COLORS = {
-    Confirmed: '#dc2626',  // red-600
-    Probable:  '#ea580c',  // orange-600
-    Suspected: '#ca8a04',  // yellow-600
+    Confirmed: '#ef4444',
+    Probable:  '#f97316',
+    Suspected: '#eab308',
   };
 
-  /**
-   * Returns the fill color for a given case status.
-   * @param {string} status
-   * @returns {string} hex color
-   */
-  function colorForStatus(status) {
-    return STATUS_COLORS[status] || '#6b7280'; // gray fallback
-  }
+  function colorForStatus(s) { return STATUS_COLORS[s] || '#94a3b8'; }
 
-  /**
-   * Scales marker radius based on case count.
-   * Individual cases default to radius 8; clusters handled by markercluster.
-   * @param {number|null} count
-   * @returns {number} radius in pixels
-   */
-  function radiusForCount(count) {
-    if (!count || count <= 1) return 8;
-    const MIN_R = 8;
-    const MAX_R = 30;
-    // Logarithmic scale: count 1→8, count 100→30
-    const scaled = MIN_R + (MAX_R - MIN_R) * (Math.log(count) / Math.log(100));
-    return Math.min(MAX_R, Math.max(MIN_R, scaled));
-  }
-
-  // ---------------------------------------------------------------------------
-  // Popup content builder
-  // ---------------------------------------------------------------------------
-  /**
-   * Builds accessible HTML popup content for a GeoJSON feature.
-   * @param {object} props — feature.properties
-   * @returns {string} HTML string
-   */
-  function buildPopupHTML(props) {
-    const status = props.status || 'Unknown';
-    const statusColor = colorForStatus(status);
-    const dateStr = props.date_reported
-      ? new Date(props.date_reported).toLocaleDateString('en-GB', {
-          year: 'numeric', month: 'long', day: 'numeric',
-        })
-      : 'Unknown date';
-
-    return `
-      <div style="min-width:220px;font-family:system-ui,sans-serif;font-size:13px;line-height:1.5;">
-        <h3 style="margin:0 0 6px;font-size:14px;font-weight:700;color:#111;">
-          ${escapeHTML(props.location_name || 'Unknown location')}
-        </h3>
-        <p style="margin:2px 0;">
-          <span style="display:inline-block;width:10px;height:10px;border-radius:50%;
-                       background:${statusColor};margin-right:5px;vertical-align:middle;"
-                aria-hidden="true"></span>
-          <strong>Status:</strong> ${escapeHTML(status)}
-        </p>
-        <p style="margin:2px 0;"><strong>Date reported:</strong> ${escapeHTML(dateStr)}</p>
-        <p style="margin:2px 0;"><strong>Source:</strong> ${escapeHTML(props.source || 'Unknown')}</p>
-        <p style="margin:2px 0;"><strong>Virus strain:</strong> ${escapeHTML(props.virus_strain || 'Unknown')}</p>
-        ${props.notes ? `<p style="margin:6px 0 0;font-size:12px;color:#555;border-top:1px solid #e5e7eb;padding-top:5px;">${escapeHTML(props.notes)}</p>` : ''}
-      </div>
-    `;
-  }
-
-  /**
-   * Minimal HTML escaping to prevent XSS in popup content.
-   * @param {string} str
-   * @returns {string}
-   */
-  function escapeHTML(str) {
+  function esc(str) {
     if (typeof str !== 'string') return String(str);
-    return str
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#39;');
+    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+              .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
   }
 
-  // ---------------------------------------------------------------------------
-  // Marker factory
-  // ---------------------------------------------------------------------------
-  /**
-   * Creates a Leaflet marker for a GeoJSON feature.
-   * Andes virus cases get a pulsing DivIcon ring; others get a circleMarker.
-   * @param {object} feature — GeoJSON Feature
-   * @returns {L.CircleMarker|L.Marker}
-   */
+  function buildPopup(props) {
+    const status = props.status || 'Unknown';
+    const color  = colorForStatus(status);
+    const date   = props.date_reported
+      ? new Date(props.date_reported).toLocaleDateString('en-GB', { year:'numeric', month:'short', day:'numeric' })
+      : '—';
+    const isAndes = props.virus_strain === 'Andes';
+
+    return `<div style="min-width:230px;font-family:system-ui,sans-serif;font-size:13px;line-height:1.6;color:#e2e8f0;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+        <span style="width:10px;height:10px;border-radius:50%;background:${color};display:inline-block;flex-shrink:0;${isAndes?'box-shadow:0 0 6px '+color+';':''}"></span>
+        <strong style="font-size:14px;color:#f1f5f9;">${esc(props.location_name || 'Unknown')}</strong>
+      </div>
+      <table style="width:100%;border-collapse:collapse;font-size:12px;">
+        <tr><td style="color:#64748b;padding:2px 0;width:90px;">Status</td>
+            <td style="color:${color};font-weight:600;">${esc(status)}</td></tr>
+        <tr><td style="color:#64748b;padding:2px 0;">Date</td>
+            <td>${esc(date)}</td></tr>
+        <tr><td style="color:#64748b;padding:2px 0;">Source</td>
+            <td>${esc(props.source || '—')}</td></tr>
+        <tr><td style="color:#64748b;padding:2px 0;">Strain</td>
+            <td style="color:${isAndes?'#f87171':'#e2e8f0'};font-weight:${isAndes?'600':'400'};">${esc(props.virus_strain || '—')}</td></tr>
+      </table>
+      ${props.notes ? `<div style="margin-top:8px;padding-top:8px;border-top:1px solid #1e2d45;font-size:11px;color:#94a3b8;line-height:1.5;">${esc(props.notes)}</div>` : ''}
+    </div>`;
+  }
+
   function createMarker(feature) {
-    const props = feature.properties;
-    const coords = feature.geometry.coordinates; // [lon, lat]
+    const props  = feature.properties;
+    const coords = feature.geometry.coordinates;
     const latlng = L.latLng(coords[1], coords[0]);
     const status = props.status || 'Unknown';
-    const color = colorForStatus(status);
-    const radius = radiusForCount(props.case_count || 1);
+    const color  = colorForStatus(status);
     const isAndes = props.virus_strain === 'Andes';
 
     let marker;
 
     if (isAndes) {
-      // Pulsing DivIcon for Andes virus cases
       const icon = L.divIcon({
         className: '',
-        html: `<div class="pulse-ring" role="img"
-                    aria-label="Andes virus case at ${escapeHTML(props.location_name || 'unknown location')}, status: ${escapeHTML(status)}">
-               </div>`,
-        iconSize: [16, 16],
-        iconAnchor: [8, 8],
-        popupAnchor: [0, -10],
+        html: `<div class="pulse-marker" style="background:${color};color:${color};"
+                    role="img" aria-label="${esc(props.location_name||'')}, ${esc(status)}, Andes virus"></div>`,
+        iconSize: [14, 14],
+        iconAnchor: [7, 7],
+        popupAnchor: [0, -12],
       });
       marker = L.marker(latlng, { icon });
     } else {
       marker = L.circleMarker(latlng, {
-        radius,
+        radius: 8,
         fillColor: color,
-        color: '#fff',
-        weight: 1.5,
-        opacity: 0.9,
+        color: 'rgba(255,255,255,0.2)',
+        weight: 1,
+        opacity: 1,
         fillOpacity: 0.85,
-        // Accessible title for screen readers
-        title: `${props.location_name || 'Case'} — ${status}`,
+        title: `${props.location_name || ''} — ${status}`,
       });
     }
 
-    // Bind popup
-    marker.bindPopup(buildPopupHTML(props), {
-      maxWidth: 300,
-      className: 'hanta-popup',
-    });
-
-    // Keyboard accessibility: open popup on Enter/Space
-    marker.on('keydown', function (e) {
-      if (e.originalEvent.key === 'Enter' || e.originalEvent.key === ' ') {
-        this.openPopup();
-      }
-    });
-
+    marker.bindPopup(buildPopup(props), { maxWidth: 320 });
     return marker;
   }
 
-  // ---------------------------------------------------------------------------
-  // renderMarkers — exported on window, called by filters.js
-  // ---------------------------------------------------------------------------
-  /**
-   * Clears the cluster group and re-renders markers from the given feature array.
-   * @param {Array} features — array of GeoJSON Feature objects
-   */
-  window.renderMarkers = function renderMarkers(features) {
-    const { clusterGroup } = window.mapState;
-    if (!clusterGroup) return;
+  function updateVisibleCount(n) {
+    const el = document.getElementById('visible-count');
+    if (el) el.textContent = n;
+  }
 
-    clusterGroup.clearLayers();
-
-    features.forEach(function (feature) {
-      if (
-        !feature.geometry ||
-        !feature.geometry.coordinates ||
-        feature.geometry.coordinates.length < 2
-      ) return;
-
-      const marker = createMarker(feature);
-      clusterGroup.addLayer(marker);
+  window.renderMarkers = function (features) {
+    const cg = window.mapState.clusterGroup;
+    if (!cg) return;
+    cg.clearLayers();
+    features.forEach(function (f) {
+      if (!f.geometry || !f.geometry.coordinates || f.geometry.coordinates.length < 2) return;
+      cg.addLayer(createMarker(f));
     });
+    updateVisibleCount(features.length);
   };
 
-  // ---------------------------------------------------------------------------
-  // Map initialization
-  // ---------------------------------------------------------------------------
   function initMap() {
     const map = L.map('map', {
       center: [20, 0],
       zoom: 2,
       minZoom: 2,
       maxZoom: 18,
-      zoomControl: true,
+      zoomControl: false,
     });
 
-    // OpenStreetMap tile layer
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution:
-        '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors',
+    // Dark tile layer (CartoDB Dark Matter)
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>',
+      subdomains: 'abcd',
       maxZoom: 19,
     }).addTo(map);
 
-    // Marker cluster group
+    // Zoom control bottom-right
+    L.control.zoom({ position: 'bottomright' }).addTo(map);
+
+    // Cluster group with dark styling
     const clusterGroup = L.markerClusterGroup({
-      maxClusterRadius: 80,
+      maxClusterRadius: 60,
       showCoverageOnHover: false,
+      spiderfyOnMaxZoom: true,
       iconCreateFunction: function (cluster) {
-        const count = cluster.getChildCount();
-        let size = 'small';
-        if (count >= 10) size = 'medium';
-        if (count >= 50) size = 'large';
+        const n = cluster.getChildCount();
+        const size = n >= 20 ? 44 : n >= 10 ? 38 : 32;
         return L.divIcon({
-          html: `<div aria-label="${count} cases in this area"><span>${count}</span></div>`,
-          className: `marker-cluster marker-cluster-${size}`,
-          iconSize: L.point(40, 40),
+          html: `<div style="
+            width:${size}px;height:${size}px;border-radius:50%;
+            background:rgba(59,130,246,0.2);
+            border:2px solid rgba(59,130,246,0.6);
+            display:flex;align-items:center;justify-content:center;
+            color:#93c5fd;font-weight:700;font-size:${n>=10?12:13}px;
+            box-shadow:0 0 12px rgba(59,130,246,0.3);
+          " aria-label="${n} cases">${n}</div>`,
+          className: '',
+          iconSize: [size, size],
+          iconAnchor: [size/2, size/2],
         });
       },
     });
     map.addLayer(clusterGroup);
 
-    // Store references
     window.mapState.map = map;
     window.mapState.clusterGroup = clusterGroup;
-
     return map;
   }
 
-  // ---------------------------------------------------------------------------
-  // MV Hondius route overlay
-  // ---------------------------------------------------------------------------
   function addHondiusRoute(map) {
-    const polyline = L.polyline(MV_HONDIUS_ROUTE, {
-      color: '#3b82f6',       // blue-500
+    // Animated dashed route
+    const line = L.polyline(MV_HONDIUS_ROUTE, {
+      color: '#38bdf8',
       weight: 2,
       opacity: 0.7,
-      dashArray: '8, 6',
+      dashArray: '10 8',
+    }).addTo(map);
+
+    line.bindTooltip('🚢 MV Hondius voyage route (Apr–May 2026)', {
+      sticky: true,
+      className: '',
     });
 
-    polyline.bindTooltip('MV Hondius voyage route (Apr–May 2026)', {
-      permanent: false,
-      direction: 'top',
-      className: 'hondius-tooltip',
+    // Waypoint dots
+    MV_HONDIUS_ROUTE.forEach(function (coord, i) {
+      const isFirst = i === 0;
+      const isLast  = i === MV_HONDIUS_ROUTE.length - 1;
+      if (isFirst || isLast) {
+        L.circleMarker(coord, {
+          radius: isFirst || isLast ? 5 : 3,
+          fillColor: '#38bdf8',
+          color: '#0ea5e9',
+          weight: 1.5,
+          fillOpacity: 0.9,
+        }).addTo(map).bindTooltip(
+          isFirst ? '🛳 Departure: Ushuaia, Argentina (Apr 1)' : '🏁 Arrival: Tenerife, Canary Islands (May 10)',
+          { direction: isFirst ? 'right' : 'left' }
+        );
+      }
     });
-
-    polyline.addTo(map);
-    return polyline;
   }
 
-  // ---------------------------------------------------------------------------
-  // Data loading
-  // ---------------------------------------------------------------------------
   function loadGeoJSON() {
     fetch('data/cases.geojson')
-      .then(function (response) {
-        if (!response.ok) {
-          throw new Error('Failed to fetch cases.geojson: ' + response.status);
-        }
-        return response.json();
+      .then(function (r) {
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        return r.json();
       })
       .then(function (geojson) {
         const features = geojson.features || [];
         const metadata = geojson.metadata || {};
-
-        // Store all features for filtering
         window.mapState.allFeatures = features;
-
-        // Initial render — all features
         window.renderMarkers(features);
-
-        // Notify ui.js and filters.js that data is ready
-        const event = new CustomEvent('geojsonloaded', {
-          detail: { metadata, features },
-        });
-        document.dispatchEvent(event);
+        document.dispatchEvent(new CustomEvent('geojsonloaded', { detail: { metadata, features } }));
       })
       .catch(function (err) {
-        console.error('[map.js] Error loading GeoJSON:', err);
-        // Show a user-visible error in the map container
-        const mapEl = document.getElementById('map');
-        if (mapEl) {
-          const errDiv = document.createElement('div');
-          errDiv.setAttribute('role', 'alert');
-          errDiv.style.cssText =
-            'position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);' +
-            'background:#fff;padding:16px;border-radius:8px;text-align:center;z-index:1000;' +
-            'box-shadow:0 4px 12px rgba(0,0,0,0.3);max-width:300px;';
-          errDiv.innerHTML =
-            '<p style="color:#dc2626;font-weight:bold;">⚠ Could not load case data</p>' +
-            '<p style="color:#374151;font-size:13px;margin-top:4px;">Please check your connection and refresh.</p>';
-          mapEl.appendChild(errDiv);
+        console.error('[map.js] Failed to load GeoJSON:', err);
+        const el = document.getElementById('map');
+        if (el) {
+          const d = document.createElement('div');
+          d.setAttribute('role', 'alert');
+          d.style.cssText = 'position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:#111827;border:1px solid #ef4444;padding:20px;border-radius:10px;text-align:center;z-index:1000;color:#fca5a5;max-width:280px;';
+          d.innerHTML = '<p style="font-weight:700;margin-bottom:6px;">⚠ Could not load case data</p><p style="font-size:12px;color:#94a3b8;">Check your connection and refresh the page.</p>';
+          el.appendChild(d);
         }
       });
   }
 
-  // ---------------------------------------------------------------------------
-  // Bootstrap
-  // ---------------------------------------------------------------------------
   document.addEventListener('DOMContentLoaded', function () {
     const map = initMap();
     addHondiusRoute(map);
     loadGeoJSON();
   });
-
 })();

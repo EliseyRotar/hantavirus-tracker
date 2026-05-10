@@ -1,266 +1,136 @@
 /**
- * filters.js — Filter controls for the Live Hantavirus Global Tracker.
- *
- * Injects filter UI into #filter-controls and wires changes to
- * window.renderMarkers() using window.mapState.allFeatures.
- *
- * Filters:
- *   1. Status checkboxes: Confirmed, Probable, Suspected
- *   2. Virus strain select: All | Andes | Sin Nombre | Unknown
- *   3. Date range: start date + end date
+ * filters.js — Filter controls for the Hantavirus Tracker.
  */
-
 (function () {
   'use strict';
 
-  // ---------------------------------------------------------------------------
-  // Filter state
-  // ---------------------------------------------------------------------------
-  const filterState = {
+  const state = {
     statuses: new Set(['Confirmed', 'Probable', 'Suspected']),
     strain: 'all',
-    dateStart: null,  // Date object or null
-    dateEnd: null,    // Date object or null
+    dateStart: null,
+    dateEnd: null,
   };
 
-  // ---------------------------------------------------------------------------
-  // Apply filters and re-render
-  // ---------------------------------------------------------------------------
   function applyFilters() {
-    const allFeatures = (window.mapState && window.mapState.allFeatures) || [];
-
-    const filtered = allFeatures.filter(function (feature) {
-      const props = feature.properties || {};
-
-      // 1. Status filter
-      if (!filterState.statuses.has(props.status)) return false;
-
-      // 2. Virus strain filter
-      if (filterState.strain !== 'all') {
-        const strain = (props.virus_strain || 'Unknown').toLowerCase();
-        const target = filterState.strain.toLowerCase();
-        if (strain !== target) return false;
-      }
-
-      // 3. Date range filter
-      if (filterState.dateStart || filterState.dateEnd) {
-        const caseDate = props.date_reported ? new Date(props.date_reported) : null;
-        if (!caseDate || isNaN(caseDate.getTime())) return false;
-
-        if (filterState.dateStart && caseDate < filterState.dateStart) return false;
-        if (filterState.dateEnd) {
-          // Include the full end day
-          const endOfDay = new Date(filterState.dateEnd);
-          endOfDay.setHours(23, 59, 59, 999);
-          if (caseDate > endOfDay) return false;
+    const all = (window.mapState && window.mapState.allFeatures) || [];
+    const filtered = all.filter(function (f) {
+      const p = f.properties || {};
+      if (!state.statuses.has(p.status)) return false;
+      if (state.strain !== 'all' && (p.virus_strain || 'Unknown').toLowerCase() !== state.strain.toLowerCase()) return false;
+      if (state.dateStart || state.dateEnd) {
+        const d = p.date_reported ? new Date(p.date_reported) : null;
+        if (!d || isNaN(d)) return false;
+        if (state.dateStart && d < state.dateStart) return false;
+        if (state.dateEnd) {
+          const end = new Date(state.dateEnd);
+          end.setHours(23,59,59,999);
+          if (d > end) return false;
         }
       }
-
       return true;
     });
+    if (typeof window.renderMarkers === 'function') window.renderMarkers(filtered);
 
-    if (typeof window.renderMarkers === 'function') {
-      window.renderMarkers(filtered);
-    }
+    // Update stats
+    const counts = { Confirmed: 0, Probable: 0, Suspected: 0 };
+    filtered.forEach(function (f) {
+      const s = (f.properties || {}).status;
+      if (counts[s] !== undefined) counts[s]++;
+    });
+    ['Confirmed','Probable','Suspected'].forEach(function (s) {
+      const el = document.getElementById('count-' + s.toLowerCase());
+      if (el) el.textContent = counts[s];
+    });
   }
 
-  // ---------------------------------------------------------------------------
-  // Build filter UI
-  // ---------------------------------------------------------------------------
-  function buildFilterControls() {
+  function mk(tag, attrs, text) {
+    const el = document.createElement(tag);
+    Object.entries(attrs || {}).forEach(function (e) { el.setAttribute(e[0], e[1]); });
+    if (text !== undefined) el.textContent = text;
+    return el;
+  }
+
+  function buildControls() {
     const container = document.getElementById('filter-controls');
     if (!container) return;
-
     container.innerHTML = '';
 
-    // ---- 1. Status checkboxes ----
-    const statusGroup = document.createElement('fieldset');
-    statusGroup.className = 'border border-gray-600 rounded p-2';
-
-    const statusLegend = document.createElement('legend');
-    statusLegend.className = 'text-xs font-semibold text-gray-300 px-1';
-    statusLegend.textContent = 'Case Status';
-    statusGroup.appendChild(statusLegend);
-
-    const statuses = ['Confirmed', 'Probable', 'Suspected'];
-    const statusColors = {
-      Confirmed: 'text-red-400',
-      Probable:  'text-orange-400',
-      Suspected: 'text-yellow-400',
-    };
-
-    statuses.forEach(function (status) {
-      const label = document.createElement('label');
-      label.className = 'flex items-center gap-2 cursor-pointer py-0.5 text-sm';
-
-      const checkbox = document.createElement('input');
-      checkbox.type = 'checkbox';
-      checkbox.checked = true;
-      checkbox.value = status;
-      checkbox.id = 'filter-status-' + status.toLowerCase();
-      checkbox.setAttribute('aria-label', 'Show ' + status + ' cases');
-      checkbox.className =
-        'w-4 h-4 rounded border-gray-500 bg-gray-700 text-red-500 cursor-pointer ' +
-        'focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-500';
-
-      checkbox.addEventListener('change', function () {
-        if (this.checked) {
-          filterState.statuses.add(status);
-        } else {
-          filterState.statuses.delete(status);
-        }
-        applyFilters();
-      });
-
-      const span = document.createElement('span');
-      span.className = statusColors[status] || 'text-gray-300';
-      span.textContent = status;
-
-      label.appendChild(checkbox);
-      label.appendChild(span);
-      statusGroup.appendChild(label);
-    });
-
-    container.appendChild(statusGroup);
-
-    // ---- 2. Virus strain select ----
-    const strainWrapper = document.createElement('div');
-    strainWrapper.className = 'flex flex-col gap-1';
-
-    const strainLabel = document.createElement('label');
-    strainLabel.htmlFor = 'filter-strain';
-    strainLabel.className = 'text-xs font-semibold text-gray-300';
-    strainLabel.textContent = 'Virus Strain';
-
-    const strainSelect = document.createElement('select');
-    strainSelect.id = 'filter-strain';
-    strainSelect.setAttribute('aria-label', 'Filter by virus strain');
-    strainSelect.className =
-      'bg-gray-700 border border-gray-600 text-gray-100 text-sm rounded px-2 py-1 ' +
-      'focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-500 cursor-pointer';
-
-    const strainOptions = [
-      { value: 'all',        label: 'All strains' },
-      { value: 'Andes',      label: 'Andes' },
-      { value: 'Sin Nombre', label: 'Sin Nombre' },
-      { value: 'Unknown',    label: 'Unknown' },
+    // ── Status checkboxes ──
+    const statuses = [
+      { val: 'Confirmed', color: '#ef4444' },
+      { val: 'Probable',  color: '#f97316' },
+      { val: 'Suspected', color: '#eab308' },
     ];
 
-    strainOptions.forEach(function (opt) {
-      const option = document.createElement('option');
-      option.value = opt.value;
-      option.textContent = opt.label;
-      strainSelect.appendChild(option);
+    const statusWrap = mk('div', { style: 'display:flex;flex-direction:column;gap:2px;' });
+    const statusLbl = mk('div', { class: 'filter-label' }, 'Case Status');
+    statusWrap.appendChild(statusLbl);
+
+    statuses.forEach(function (s) {
+      const row = mk('label', { class: 'checkbox-row', style: 'user-select:none;' });
+      const cb  = mk('input', { type: 'checkbox', id: 'fs-' + s.val.toLowerCase(), 'aria-label': 'Show ' + s.val + ' cases' });
+      cb.checked = true;
+      cb.addEventListener('change', function () {
+        if (this.checked) state.statuses.add(s.val); else state.statuses.delete(s.val);
+        applyFilters();
+      });
+      const dot = mk('span', { class: 'dot', style: 'background:' + s.color + ';' });
+      const lbl = mk('span', {}, s.val);
+      row.appendChild(cb); row.appendChild(dot); row.appendChild(lbl);
+      statusWrap.appendChild(row);
     });
+    container.appendChild(statusWrap);
 
-    strainSelect.addEventListener('change', function () {
-      filterState.strain = this.value;
-      applyFilters();
+    // ── Strain select ──
+    const strainWrap = mk('div', { class: 'filter-group' });
+    const strainLbl  = mk('label', { class: 'filter-label', for: 'fs-strain' }, 'Virus Strain');
+    const strainSel  = mk('select', { id: 'fs-strain', 'aria-label': 'Filter by virus strain' });
+    [['all','All strains'],['Andes','Andes'],['Sin Nombre','Sin Nombre'],['Unknown','Unknown']].forEach(function (o) {
+      const opt = mk('option', { value: o[0] }, o[1]);
+      strainSel.appendChild(opt);
     });
+    strainSel.addEventListener('change', function () { state.strain = this.value; applyFilters(); });
+    strainWrap.appendChild(strainLbl); strainWrap.appendChild(strainSel);
+    container.appendChild(strainWrap);
 
-    strainWrapper.appendChild(strainLabel);
-    strainWrapper.appendChild(strainSelect);
-    container.appendChild(strainWrapper);
+    // ── Date range ──
+    const dateWrap = mk('div', { class: 'filter-group' });
+    const dateLbl  = mk('div', { class: 'filter-label' }, 'Date Range');
+    const dateRow  = mk('div', { class: 'date-row' });
 
-    // ---- 3. Date range ----
-    const dateWrapper = document.createElement('div');
-    dateWrapper.className = 'flex flex-col gap-1';
+    const startWrap = mk('div', { class: 'filter-group' });
+    const startLbl  = mk('label', { class: 'filter-label', for: 'fs-date-start' }, 'From');
+    const startIn   = mk('input', { type: 'date', id: 'fs-date-start', 'aria-label': 'From date' });
+    startIn.addEventListener('change', function () { state.dateStart = this.value ? new Date(this.value) : null; applyFilters(); });
+    startWrap.appendChild(startLbl); startWrap.appendChild(startIn);
 
-    const dateHeading = document.createElement('p');
-    dateHeading.className = 'text-xs font-semibold text-gray-300';
-    dateHeading.textContent = 'Date Range';
-    dateWrapper.appendChild(dateHeading);
+    const endWrap = mk('div', { class: 'filter-group' });
+    const endLbl  = mk('label', { class: 'filter-label', for: 'fs-date-end' }, 'To');
+    const endIn   = mk('input', { type: 'date', id: 'fs-date-end', 'aria-label': 'To date' });
+    endIn.addEventListener('change', function () { state.dateEnd = this.value ? new Date(this.value) : null; applyFilters(); });
+    endWrap.appendChild(endLbl); endWrap.appendChild(endIn);
 
-    const dateRow = document.createElement('div');
-    dateRow.className = 'flex flex-col gap-1';
+    dateRow.appendChild(startWrap); dateRow.appendChild(endWrap);
+    dateWrap.appendChild(dateLbl); dateWrap.appendChild(dateRow);
+    container.appendChild(dateWrap);
 
-    // Start date
-    const startLabel = document.createElement('label');
-    startLabel.htmlFor = 'filter-date-start';
-    startLabel.className = 'text-xs text-gray-400';
-    startLabel.textContent = 'From';
-
-    const startInput = document.createElement('input');
-    startInput.type = 'date';
-    startInput.id = 'filter-date-start';
-    startInput.setAttribute('aria-label', 'Filter cases from this date');
-    startInput.className =
-      'bg-gray-700 border border-gray-600 text-gray-100 text-sm rounded px-2 py-1 ' +
-      'focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-500 cursor-pointer';
-
-    startInput.addEventListener('change', function () {
-      filterState.dateStart = this.value ? new Date(this.value) : null;
-      applyFilters();
-    });
-
-    // End date
-    const endLabel = document.createElement('label');
-    endLabel.htmlFor = 'filter-date-end';
-    endLabel.className = 'text-xs text-gray-400';
-    endLabel.textContent = 'To';
-
-    const endInput = document.createElement('input');
-    endInput.type = 'date';
-    endInput.id = 'filter-date-end';
-    endInput.setAttribute('aria-label', 'Filter cases up to this date');
-    endInput.className =
-      'bg-gray-700 border border-gray-600 text-gray-100 text-sm rounded px-2 py-1 ' +
-      'focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-500 cursor-pointer';
-
-    endInput.addEventListener('change', function () {
-      filterState.dateEnd = this.value ? new Date(this.value) : null;
-      applyFilters();
-    });
-
-    dateRow.appendChild(startLabel);
-    dateRow.appendChild(startInput);
-    dateRow.appendChild(endLabel);
-    dateRow.appendChild(endInput);
-    dateWrapper.appendChild(dateRow);
-    container.appendChild(dateWrapper);
-
-    // ---- Reset button ----
-    const resetBtn = document.createElement('button');
-    resetBtn.type = 'button';
-    resetBtn.textContent = 'Reset Filters';
-    resetBtn.setAttribute('aria-label', 'Reset all filters to default values');
-    resetBtn.className =
-      'mt-1 w-full text-xs bg-gray-700 hover:bg-gray-600 text-gray-300 ' +
-      'border border-gray-600 rounded px-3 py-1.5 cursor-pointer transition-colors ' +
-      'focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-500';
-
+    // ── Reset ──
+    const resetBtn = mk('button', { type: 'button', class: 'btn-reset', 'aria-label': 'Reset all filters' }, '↺ Reset Filters');
     resetBtn.addEventListener('click', function () {
-      // Reset state
-      filterState.statuses = new Set(['Confirmed', 'Probable', 'Suspected']);
-      filterState.strain = 'all';
-      filterState.dateStart = null;
-      filterState.dateEnd = null;
-
-      // Reset UI
+      state.statuses = new Set(['Confirmed','Probable','Suspected']);
+      state.strain = 'all';
+      state.dateStart = null; state.dateEnd = null;
       statuses.forEach(function (s) {
-        const cb = document.getElementById('filter-status-' + s.toLowerCase());
+        const cb = document.getElementById('fs-' + s.val.toLowerCase());
         if (cb) cb.checked = true;
       });
-      strainSelect.value = 'all';
-      startInput.value = '';
-      endInput.value = '';
-
+      strainSel.value = 'all';
+      startIn.value = ''; endIn.value = '';
       applyFilters();
     });
-
     container.appendChild(resetBtn);
   }
 
-  // ---------------------------------------------------------------------------
-  // Bootstrap — build controls once DOM is ready, re-apply when data loads
-  // ---------------------------------------------------------------------------
-  document.addEventListener('DOMContentLoaded', function () {
-    buildFilterControls();
-  });
-
-  // Re-apply filters when new GeoJSON data arrives (dispatched by map.js)
-  document.addEventListener('geojsonloaded', function () {
-    applyFilters();
-  });
-
+  document.addEventListener('DOMContentLoaded', buildControls);
+  document.addEventListener('geojsonloaded', applyFilters);
 })();
