@@ -136,6 +136,8 @@
       minZoom:    2,
       maxZoom:    18,
       zoomControl: false,
+      maxBounds: [[-90, -Infinity], [90, Infinity]],
+      maxBoundsViscosity: 1.0,
     });
 
     L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
@@ -146,6 +148,7 @@
         'K. Panozzo, University of Toledo',
       subdomains: 'abcd',
       maxZoom:    19,
+      noWrap:     false,
     }).addTo(map);
 
     L.control.zoom({ position: 'bottomright' }).addTo(map);
