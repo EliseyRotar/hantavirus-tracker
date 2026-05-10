@@ -50,7 +50,7 @@ def _check_robots(url: str) -> None:
         )
 
 
-def fetch(url: str, source_name: str, *, timeout: int = 30) -> requests.Response:
+def fetch(url: str, source_name: str, *, timeout: int = 30, skip_robots: bool = False) -> requests.Response:
     """
     Fetch a URL with retry logic and robots.txt compliance.
 
@@ -62,6 +62,8 @@ def fetch(url: str, source_name: str, *, timeout: int = 30) -> requests.Response
         Human-readable name of the data source (used in log messages).
     timeout : int
         Request timeout in seconds (default: 30).
+    skip_robots : bool
+        If True, skip the robots.txt check (use for REST APIs / data endpoints).
 
     Returns
     -------
@@ -71,12 +73,12 @@ def fetch(url: str, source_name: str, *, timeout: int = 30) -> requests.Response
     Raises
     ------
     PermissionError
-        If robots.txt disallows fetching the URL.
+        If robots.txt disallows fetching the URL (and skip_robots is False).
     Exception
         The last exception raised after all retry attempts are exhausted.
     """
-    # Check robots.txt before making any requests
-    _check_robots(url)
+    if not skip_robots:
+        _check_robots(url)
 
     headers = {"User-Agent": USER_AGENT}
     last_exception: Exception | None = None
@@ -110,39 +112,9 @@ def fetch(url: str, source_name: str, *, timeout: int = 30) -> requests.Response
     raise last_exception
 
 
-def fetch_text(url: str, source_name: str) -> str:
-    """
-    Fetch a URL and return the response body as text.
-
-    Parameters
-    ----------
-    url : str
-        The URL to fetch.
-    source_name : str
-        Human-readable name of the data source.
-
-    Returns
-    -------
-    str
-        The response body decoded as text.
-    """
-    return fetch(url, source_name).text
+def fetch_text(url: str, source_name: str, skip_robots: bool = False) -> str:
+    return fetch(url, source_name, skip_robots=skip_robots).text
 
 
-def fetch_json(url: str, source_name: str) -> dict | list:
-    """
-    Fetch a URL and return the response body parsed as JSON.
-
-    Parameters
-    ----------
-    url : str
-        The URL to fetch.
-    source_name : str
-        Human-readable name of the data source.
-
-    Returns
-    -------
-    dict | list
-        The parsed JSON response body.
-    """
-    return fetch(url, source_name).json()
+def fetch_json(url: str, source_name: str, skip_robots: bool = False) -> dict | list:
+    return fetch(url, source_name, skip_robots=skip_robots).json()

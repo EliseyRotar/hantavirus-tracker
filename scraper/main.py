@@ -138,9 +138,10 @@ _HONDIUS_ITINERARY: list[dict] = [
 # ---------------------------------------------------------------------------
 def _load_collectors() -> list[tuple[str, Callable]]:
     """Import all source collector modules and return (name, collect_fn) pairs."""
-    from scraper.sources import who, ecdc, cdc, healthmap, gdelt
+    from scraper.sources import arcgis, who, ecdc, cdc, healthmap, gdelt
 
     return [
+        ("ANDV_Dashboard", arcgis.collect),   # primary — ArcGIS live data
         ("WHO", who.collect),
         ("ECDC", ecdc.collect),
         ("CDC", cdc.collect),

@@ -15,10 +15,13 @@
     const all = (window.mapState && window.mapState.allFeatures) || [];
     const filtered = all.filter(function (f) {
       const p = f.properties || {};
-      if (!state.statuses.has(p.status)) return false;
-      if (state.strain !== 'all' && (p.virus_strain || 'Unknown').toLowerCase() !== state.strain.toLowerCase()) return false;
+      // Support both ArcGIS uppercase and local titlecase status
+      const status = p.status || (p.STATUS ? p.STATUS.charAt(0) + p.STATUS.slice(1).toLowerCase() : 'Unknown');
+      if (!state.statuses.has(status)) return false;
+      if (state.strain !== 'all' && (p.virus_strain || 'Andes').toLowerCase() !== state.strain.toLowerCase()) return false;
       if (state.dateStart || state.dateEnd) {
-        const d = p.date_reported ? new Date(p.date_reported) : null;
+        const raw = p.date_reported || p.ONSET;
+        const d = raw ? new Date(raw) : null;
         if (!d || isNaN(d)) return false;
         if (state.dateStart && d < state.dateStart) return false;
         if (state.dateEnd) {
