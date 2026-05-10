@@ -4,7 +4,7 @@ An automated surveillance dashboard that aggregates hantavirus case data from mu
 
 ## Live Site
 
-[https://\<username\>.github.io/\<repo\>/](https://<username>.github.io/<repo>/)
+**[https://eliseyrotar.github.io/hantavirus-tracker/](https://eliseyrotar.github.io/hantavirus-tracker/)**
 
 ## Features
 

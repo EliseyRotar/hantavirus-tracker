@@ -43,11 +43,16 @@
 
     #map-container {
       flex: 1;
-      height: 100vh;
+      min-width: 0;
       position: relative;
     }
 
     #map {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
       width: 100%;
       height: 100%;
     }
@@ -246,7 +251,7 @@
     </aside>
 
     <!-- Map Container -->
-    <main id="map-container">
+    <main id="map-container" style="flex:1;min-width:0;position:relative;height:100vh;">
       <div id="map"
            role="application"
            aria-label="Live hantavirus case map showing global distribution of confirmed, probable, and suspected cases"
