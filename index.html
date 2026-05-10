@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🦠 Live Hantavirus Tracker — May 2026 Andes Virus Outbreak</title>
+  <meta name="description" content="Live global hantavirus case tracker showing confirmed, probable, and suspected cases. May 2026 Andes virus outbreak focus." />
+
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+
+  <!-- Leaflet MarkerCluster CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" crossorigin="" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" crossorigin="" />
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    /* Ensure full-height layout */
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+
+    #app {
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    #sidebar {
+      width: 320px;
+      min-width: 280px;
+      max-width: 320px;
+      height: 100vh;
+      overflow-y: auto;
+      flex-shrink: 0;
+    }
+
+    #map-container {
+      flex: 1;
+      height: 100vh;
+      position: relative;
+    }
+
+    #map {
+      width: 100%;
+      height: 100%;
+    }
+
+    /* Pulse ring animation for Andes virus cases */
+    @keyframes pulse-ring-anim {
+      0%   { transform: scale(0.8); opacity: 0.9; }
+      70%  { transform: scale(2.2); opacity: 0; }
+      100% { transform: scale(2.2); opacity: 0; }
+    }
+
+    .pulse-ring {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: rgba(220, 38, 38, 0.6);
+      border: 2px solid #dc2626;
+      position: relative;
+    }
+
+    .pulse-ring::before {
+      content: '';
+      position: absolute;
+      top: -4px;
+      left: -4px;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      border: 2px solid #dc2626;
+      animation: pulse-ring-anim 1.5s ease-out infinite;
+    }
+
+    /* Focus styles — never remove outline */
+    :focus-visible {
+      outline: 2px solid #2563eb;
+      outline-offset: 2px;
+    }
+
+    /* Scrollbar styling for sidebar */
+    #sidebar::-webkit-scrollbar {
+      width: 6px;
+    }
+    #sidebar::-webkit-scrollbar-track {
+      background: #1f2937;
+    }
+    #sidebar::-webkit-scrollbar-thumb {
+      background: #4b5563;
+      border-radius: 3px;
+    }
+
+    /* Staleness warning banner */
+    #staleness-warning {
+      display: none;
+    }
+    #staleness-warning.visible {
+      display: block;
+    }
+  </style>
+</head>
+<body class="bg-gray-900 text-gray-100">
+
+  <!-- Staleness Warning Banner -->
+  <div id="staleness-warning"
+       role="alert"
+       aria-live="assertive"
+       aria-atomic="true"
+       class="fixed top-0 left-0 right-0 z-[9999] bg-amber-600 text-white text-center py-2 px-4 text-sm font-semibold shadow-lg">
+    ⚠ Data may be outdated — last update was more than 24 hours ago. Refresh or check official sources.
+  </div>
+
+  <div id="app">
+    <!-- Sidebar -->
+    <aside id="sidebar"
+           role="complementary"
+           aria-label="Tracker controls and information"
+           class="bg-gray-900 border-r border-gray-700 flex flex-col p-4 gap-4 z-10 shadow-xl">
+
+      <!-- Title -->
+      <div>
+        <h1 class="text-xl font-bold text-white leading-tight">🦠 Live Hantavirus Tracker</h1>
+        <p class="text-sm text-amber-400 font-medium mt-1">May 2026 Andes Virus Outbreak</p>
+      </div>
+
+      <!-- Medical Disclaimer -->
+      <div role="note"
+           aria-label="Medical disclaimer"
+           class="border-2 border-red-500 bg-red-950 rounded-lg p-3 text-xs text-red-200 leading-relaxed">
+        <p class="font-bold text-red-400 mb-1">⚠ MEDICAL DISCLAIMER</p>
+        <p>This tracker is for <strong>informational purposes only</strong>. Data may be incomplete or delayed. Consult a healthcare professional for medical advice.</p>
+        <p class="mt-1 text-red-300">Sources: WHO, CDC, ECDC.</p>
+      </div>
+
+      <!-- Filter Controls (populated by filters.js) -->
+      <section aria-labelledby="filters-heading">
+        <h2 id="filters-heading" class="text-sm font-semibold text-gray-300 uppercase tracking-wide mb-2">Filters</h2>
+        <div id="filter-controls" class="flex flex-col gap-3">
+          <!-- Populated by filters.js -->
+        </div>
+      </section>
+
+      <!-- Legend -->
+      <section aria-labelledby="legend-heading">
+        <h2 id="legend-heading" class="text-sm font-semibold text-gray-300 uppercase tracking-wide mb-2">Legend</h2>
+        <ul class="flex flex-col gap-2 text-sm" role="list">
+          <li class="flex items-center gap-2"
+              aria-label="Confirmed case: red circle marker">
+            <span class="inline-block w-4 h-4 rounded-full bg-red-600 border-2 border-red-400 flex-shrink-0"
+                  aria-hidden="true"></span>
+            <span>Confirmed</span>
+          </li>
+          <li class="flex items-center gap-2"
+              aria-label="Probable case: orange circle marker">
+            <span class="inline-block w-4 h-4 rounded-full bg-orange-600 border-2 border-orange-400 flex-shrink-0"
+                  aria-hidden="true"></span>
+            <span>Probable</span>
+          </li>
+          <li class="flex items-center gap-2"
+              aria-label="Suspected case: yellow circle marker">
+            <span class="inline-block w-4 h-4 rounded-full bg-yellow-600 border-2 border-yellow-400 flex-shrink-0"
+                  aria-hidden="true"></span>
+            <span>Suspected</span>
+          </li>
+          <li class="flex items-center gap-2"
+              aria-label="Andes virus case: pulsing red ring marker">
+            <span class="inline-block w-4 h-4 rounded-full border-2 border-red-500 flex-shrink-0"
+                  style="box-shadow: 0 0 0 2px rgba(220,38,38,0.4);"
+                  aria-hidden="true"></span>
+            <span>Andes virus (pulsing)</span>
+          </li>
+          <li class="flex items-center gap-2"
+              aria-label="MV Hondius voyage route: blue dashed line">
+            <span class="inline-block w-8 h-0 border-t-2 border-dashed border-blue-400 flex-shrink-0"
+                  aria-hidden="true"></span>
+            <span>MV Hondius route</span>
+          </li>
+        </ul>
+      </section>
+
+      <!-- Last Updated -->
+      <section aria-labelledby="last-updated-heading">
+        <h2 id="last-updated-heading" class="text-sm font-semibold text-gray-300 uppercase tracking-wide mb-1">Last Updated</h2>
+        <p id="last-updated" class="text-xs text-gray-400" aria-live="polite" aria-atomic="true">
+          Loading…
+        </p>
+      </section>
+
+      <!-- Data Sources Panel (populated by ui.js) -->
+      <section aria-labelledby="sources-heading">
+        <h2 id="sources-heading" class="text-sm font-semibold text-gray-300 uppercase tracking-wide mb-2">Data Sources</h2>
+        <ul id="source-timestamps" class="text-xs text-gray-400 flex flex-col gap-1" role="list" aria-live="polite" aria-atomic="true">
+          <!-- Populated by ui.js -->
+          <li>Loading…</li>
+        </ul>
+      </section>
+
+      <!-- Official Source Links -->
+      <section aria-labelledby="official-links-heading">
+        <h2 id="official-links-heading" class="text-sm font-semibold text-gray-300 uppercase tracking-wide mb-2">Official Sources</h2>
+        <ul class="flex flex-col gap-1 text-xs" role="list">
+          <li>
+            <a href="https://www.who.int/emergencies/disease-outbreak-news"
+               target="_blank"
+               rel="noopener noreferrer"
+               aria-label="WHO Disease Outbreak News (opens in new tab)"
+               class="text-blue-400 hover:text-blue-300 underline focus-visible:outline-blue-400">
+              WHO Disease Outbreak News ↗
+            </a>
+          </li>
+          <li>
+            <a href="https://www.cdc.gov/hantavirus/"
+               target="_blank"
+               rel="noopener noreferrer"
+               aria-label="CDC Hantavirus information (opens in new tab)"
+               class="text-blue-400 hover:text-blue-300 underline focus-visible:outline-blue-400">
+              CDC Hantavirus ↗
+            </a>
+          </li>
+          <li>
+            <a href="https://www.ecdc.europa.eu/en/hantavirus-infection"
+               target="_blank"
+               rel="noopener noreferrer"
+               aria-label="ECDC Hantavirus infection information (opens in new tab)"
+               class="text-blue-400 hover:text-blue-300 underline focus-visible:outline-blue-400">
+              ECDC Hantavirus ↗
+            </a>
+          </li>
+        </ul>
+      </section>
+
+      <!-- Footer -->
+      <div class="mt-auto pt-2 border-t border-gray-700 text-xs text-gray-500">
+        <p>Data updates every 4 hours via GitHub Actions.</p>
+        <p class="mt-1">Not for clinical use.</p>
+      </div>
+
+    </aside>
+
+    <!-- Map Container -->
+    <main id="map-container">
+      <div id="map"
+           role="application"
+           aria-label="Live hantavirus case map showing global distribution of confirmed, probable, and suspected cases"
+           tabindex="0">
+      </div>
+    </main>
+  </div>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+          integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV/XN2GqaE=" crossorigin=""></script>
+
+  <!-- Leaflet MarkerCluster JS -->
+  <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js" crossorigin=""></script>
+
+  <!-- App scripts — order matters: ui.js first (sets up listeners), then filters.js, then map.js (fetches data) -->
+  <script src="js/ui.js"></script>
+  <script src="js/filters.js"></script>
+  <script src="js/map.js"></script>
+
+</body>
+</html>

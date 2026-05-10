@@ -1,0 +1,44 @@
+name: Scrape Hantavirus Data
+
+on:
+  schedule:
+    - cron: "0 */4 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r scraper/requirements.txt
+
+      - name: Run scraper
+        run: python scraper/main.py
+
+      - name: Upload scrape log
+        uses: actions/upload-artifact@v4
+        with:
+          name: scrape-log
+          path: scraper/scrape.log
+
+      - name: Commit and push updated GeoJSON
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/cases.geojson
+          git diff --cached --quiet || git commit -m "chore: update cases [skip ci]"
+          git push
