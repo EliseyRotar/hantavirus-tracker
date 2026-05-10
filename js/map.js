@@ -14,9 +14,11 @@
   ];
 
   const STATUS_COLORS = {
-    Confirmed: '#ef4444',
-    Probable:  '#f97316',
-    Suspected: '#eab308',
+    Confirmed:  '#ef4444',  // red
+    Suspected:  '#f97316',  // orange
+    Deceased:   '#7c3aed',  // purple
+    Monitoring: '#0ea5e9',  // sky blue
+    Probable:   '#eab308',  // yellow (legacy)
   };
 
   function colorForStatus(s) { return STATUS_COLORS[s] || '#94a3b8'; }

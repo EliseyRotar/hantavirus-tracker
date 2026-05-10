@@ -5,7 +5,7 @@
   'use strict';
 
   const state = {
-    statuses: new Set(['Confirmed', 'Probable', 'Suspected']),
+    statuses: new Set(['Confirmed', 'Suspected', 'Deceased', 'Monitoring']),
     strain: 'all',
     dateStart: null,
     dateEnd: null,
@@ -32,14 +32,15 @@
     if (typeof window.renderMarkers === 'function') window.renderMarkers(filtered);
 
     // Update stats (desktop + mobile)
-    const counts = { Confirmed: 0, Probable: 0, Suspected: 0 };
+    const counts = { Confirmed: 0, Suspected: 0, Deceased: 0, Monitoring: 0 };
     filtered.forEach(function (f) {
       const s = (f.properties || {}).status;
       if (counts[s] !== undefined) counts[s]++;
     });
-    ['Confirmed','Probable','Suspected'].forEach(function (s) {
-      const el = document.getElementById('count-' + s.toLowerCase());
-      if (el) el.textContent = counts[s];
+    const idMap = { Confirmed: 'confirmed', Suspected: 'suspected', Deceased: 'deceased', Monitoring: 'monitoring' };
+    Object.entries(idMap).forEach(function (e) {
+      const el = document.getElementById('count-' + e[1]);
+      if (el) el.textContent = counts[e[0]];
     });
     if (typeof window.updateMobileStats === 'function') window.updateMobileStats(counts);
   }
@@ -58,9 +59,10 @@
 
     // ── Status checkboxes ──
     const statuses = [
-      { val: 'Confirmed', color: '#ef4444' },
-      { val: 'Probable',  color: '#f97316' },
-      { val: 'Suspected', color: '#eab308' },
+      { val: 'Confirmed',  color: '#ef4444' },
+      { val: 'Suspected',  color: '#f97316' },
+      { val: 'Deceased',   color: '#7c3aed' },
+      { val: 'Monitoring', color: '#0ea5e9' },
     ];
 
     const statusWrap = mk('div', { style: 'display:flex;flex-direction:column;gap:2px;' });
@@ -118,7 +120,7 @@
     // ── Reset ──
     const resetBtn = mk('button', { type: 'button', class: 'btn-reset', 'aria-label': 'Reset all filters' }, '↺ Reset Filters');
     resetBtn.addEventListener('click', function () {
-      state.statuses = new Set(['Confirmed','Probable','Suspected']);
+      state.statuses = new Set(['Confirmed','Suspected','Deceased','Monitoring']);
       state.strain = 'all';
       state.dateStart = null; state.dateEnd = null;
       statuses.forEach(function (s) {
