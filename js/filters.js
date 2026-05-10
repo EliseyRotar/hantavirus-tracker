@@ -31,7 +31,7 @@
     });
     if (typeof window.renderMarkers === 'function') window.renderMarkers(filtered);
 
-    // Update stats
+    // Update stats (desktop + mobile)
     const counts = { Confirmed: 0, Probable: 0, Suspected: 0 };
     filtered.forEach(function (f) {
       const s = (f.properties || {}).status;
@@ -41,6 +41,7 @@
       const el = document.getElementById('count-' + s.toLowerCase());
       if (el) el.textContent = counts[s];
     });
+    if (typeof window.updateMobileStats === 'function') window.updateMobileStats(counts);
   }
 
   function mk(tag, attrs, text) {

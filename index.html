@@ -2,104 +2,96 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#0a0e1a" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <title>🦠 Hantavirus Tracker — Live Global Surveillance</title>
   <meta name="description" content="Live global hantavirus surveillance map. May 2026 Andes virus outbreak on MV Hondius." />
 
-  <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" crossorigin="" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" crossorigin="" />
 
   <style>
-    /* ── Reset & base ─────────────────────────────────────────────── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg:        #0a0e1a;
-      --surface:   #111827;
-      --surface2:  #1a2235;
-      --border:    #1e2d45;
-      --accent:    #3b82f6;
-      --accent2:   #06b6d4;
-      --red:       #ef4444;
-      --orange:    #f97316;
-      --yellow:    #eab308;
-      --text:      #e2e8f0;
-      --muted:     #64748b;
+      --bg:       #0a0e1a;
+      --surface:  #111827;
+      --surface2: #1a2235;
+      --border:   #1e2d45;
+      --accent:   #3b82f6;
+      --cyan:     #06b6d4;
+      --red:      #ef4444;
+      --orange:   #f97316;
+      --yellow:   #eab308;
+      --green:    #22c55e;
+      --text:     #e2e8f0;
+      --muted:    #64748b;
       --sidebar-w: 320px;
+      --header-h: 56px;
+      --drawer-peek: 72px;
     }
 
     html, body {
-      height: 100%;
+      height: 100%; height: 100dvh;
       background: var(--bg);
       color: var(--text);
-      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
       overflow: hidden;
+      -webkit-tap-highlight-color: transparent;
     }
 
     :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
-    /* ── Layout ───────────────────────────────────────────────────── */
+    /* ═══════════════════════════════════════════════════════════════
+       DESKTOP LAYOUT  (≥ 768px)
+    ═══════════════════════════════════════════════════════════════ */
     #app {
       display: flex;
-      height: 100vh;
+      height: 100vh; height: 100dvh;
       overflow: hidden;
     }
 
-    /* ── Sidebar ──────────────────────────────────────────────────── */
+    /* ── Sidebar ── */
     #sidebar {
       width: var(--sidebar-w);
       min-width: 280px;
-      height: 100vh;
+      height: 100%;
       background: var(--surface);
       border-right: 1px solid var(--border);
       display: flex;
       flex-direction: column;
       overflow: hidden;
       flex-shrink: 0;
-      z-index: 10;
+      z-index: 20;
+      transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
     }
 
     #sidebar-header {
-      padding: 18px 16px 14px;
+      padding: 16px 16px 12px;
       background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
       border-bottom: 1px solid var(--border);
       flex-shrink: 0;
     }
 
-    .logo-row {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 4px;
-    }
+    .logo-row { display: flex; align-items: center; gap: 10px; }
 
     .logo-icon {
-      width: 36px; height: 36px;
+      width: 34px; height: 34px;
       background: radial-gradient(circle, #ef4444 0%, #7f1d1d 100%);
       border-radius: 50%;
       display: flex; align-items: center; justify-content: center;
-      font-size: 18px;
-      box-shadow: 0 0 12px rgba(239,68,68,0.5);
+      font-size: 17px;
+      box-shadow: 0 0 14px rgba(239,68,68,0.45);
       flex-shrink: 0;
     }
 
-    .logo-text h1 {
-      font-size: 15px;
-      font-weight: 700;
-      color: #f1f5f9;
-      letter-spacing: -0.3px;
-    }
+    .logo-text h1 { font-size: 14px; font-weight: 700; color: #f1f5f9; letter-spacing: -0.2px; }
+    .logo-text p  { font-size: 10px; color: #f59e0b; font-weight: 500; margin-top: 2px; }
 
-    .logo-text p {
-      font-size: 11px;
-      color: #f59e0b;
-      font-weight: 500;
-      margin-top: 1px;
-    }
-
-    /* ── Stats bar ────────────────────────────────────────────────── */
+    /* ── Stats bar ── */
     #stats-bar {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -109,482 +101,414 @@
       flex-shrink: 0;
     }
 
-    .stat-cell {
-      background: var(--surface2);
-      padding: 10px 8px;
-      text-align: center;
-    }
-
-    .stat-cell .stat-num {
-      font-size: 20px;
-      font-weight: 700;
-      line-height: 1;
-    }
-
-    .stat-cell .stat-label {
-      font-size: 9px;
-      text-transform: uppercase;
-      letter-spacing: 0.8px;
-      color: var(--muted);
-      margin-top: 3px;
-    }
-
+    .stat-cell { background: var(--surface2); padding: 9px 6px; text-align: center; }
+    .stat-num  { font-size: 19px; font-weight: 700; line-height: 1; }
+    .stat-lbl  { font-size: 9px; text-transform: uppercase; letter-spacing: 0.7px; color: var(--muted); margin-top: 2px; }
     .stat-confirmed .stat-num { color: var(--red); }
     .stat-probable  .stat-num { color: var(--orange); }
     .stat-suspected .stat-num { color: var(--yellow); }
 
-    /* ── Sidebar scroll area ──────────────────────────────────────── */
+    /* ── Sidebar body ── */
     #sidebar-body {
-      flex: 1;
-      overflow-y: auto;
+      flex: 1; overflow-y: auto;
       padding: 14px 14px 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
+      display: flex; flex-direction: column; gap: 16px;
     }
 
     #sidebar-body::-webkit-scrollbar { width: 4px; }
     #sidebar-body::-webkit-scrollbar-track { background: transparent; }
     #sidebar-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
 
-    /* ── Section headings ─────────────────────────────────────────── */
     .section-title {
-      font-size: 10px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      color: var(--muted);
-      margin-bottom: 8px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
+      font-size: 10px; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 1px;
+      color: var(--muted); margin-bottom: 8px;
+      display: flex; align-items: center; gap: 6px;
     }
+    .section-title::after { content:''; flex:1; height:1px; background: var(--border); }
 
-    .section-title::after {
-      content: '';
-      flex: 1;
-      height: 1px;
-      background: var(--border);
-    }
-
-    /* ── Disclaimer ───────────────────────────────────────────────── */
     #disclaimer {
       background: rgba(239,68,68,0.08);
       border: 1px solid rgba(239,68,68,0.3);
-      border-radius: 8px;
-      padding: 10px 12px;
-      font-size: 11px;
-      line-height: 1.5;
-      color: #fca5a5;
+      border-radius: 8px; padding: 10px 12px;
+      font-size: 11px; line-height: 1.5; color: #fca5a5;
     }
-
     #disclaimer strong { color: #f87171; display: block; margin-bottom: 3px; }
 
-    /* ── Filter controls ──────────────────────────────────────────── */
     .filter-group { display: flex; flex-direction: column; gap: 6px; }
-
-    .filter-label {
-      font-size: 11px;
-      color: var(--muted);
-      font-weight: 500;
-    }
+    .filter-label { font-size: 11px; color: var(--muted); font-weight: 500; }
 
     .checkbox-row {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 5px 8px;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: background 0.15s;
-      font-size: 12px;
+      display: flex; align-items: center; gap: 8px;
+      padding: 6px 8px; border-radius: 6px;
+      cursor: pointer; transition: background 0.15s; font-size: 13px;
+      min-height: 36px;
     }
-
     .checkbox-row:hover { background: var(--surface2); }
+    .checkbox-row input[type=checkbox] { width: 16px; height: 16px; accent-color: var(--accent); cursor: pointer; flex-shrink: 0; }
 
-    .checkbox-row input[type=checkbox] {
-      width: 14px; height: 14px;
-      accent-color: var(--accent);
-      cursor: pointer;
-      flex-shrink: 0;
-    }
-
-    .dot {
-      width: 10px; height: 10px;
-      border-radius: 50%;
-      flex-shrink: 0;
-    }
+    .dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
 
     select, input[type=date] {
       width: 100%;
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      color: var(--text);
-      font-size: 12px;
-      padding: 6px 8px;
-      border-radius: 6px;
-      outline: none;
+      background: var(--surface2); border: 1px solid var(--border);
+      color: var(--text); font-size: 13px;
+      padding: 8px 10px; border-radius: 6px; outline: none;
       transition: border-color 0.15s;
+      min-height: 38px;
     }
-
-    select:focus, input[type=date]:focus {
-      border-color: var(--accent);
-    }
+    select:focus, input[type=date]:focus { border-color: var(--accent); }
 
     .date-row { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
 
     .btn-reset {
-      width: 100%;
-      padding: 7px;
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      color: var(--muted);
-      font-size: 11px;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: all 0.15s;
-      font-weight: 500;
+      width: 100%; padding: 8px;
+      background: var(--surface2); border: 1px solid var(--border);
+      color: var(--muted); font-size: 12px; border-radius: 6px;
+      cursor: pointer; transition: all 0.15s; font-weight: 500;
+      min-height: 36px;
     }
+    .btn-reset:hover { background: var(--border); color: var(--text); }
 
-    .btn-reset:hover {
-      background: var(--border);
-      color: var(--text);
-    }
-
-    /* ── Legend ───────────────────────────────────────────────────── */
-    .legend-item {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 12px;
-      padding: 3px 0;
-    }
-
-    .legend-dot {
-      width: 12px; height: 12px;
-      border-radius: 50%;
-      flex-shrink: 0;
-    }
-
-    .legend-line {
-      width: 24px; height: 2px;
-      background: repeating-linear-gradient(90deg, #3b82f6 0, #3b82f6 5px, transparent 5px, transparent 9px);
-      flex-shrink: 0;
-    }
-
+    .legend-item { display: flex; align-items: center; gap: 8px; font-size: 12px; padding: 3px 0; }
+    .legend-dot  { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+    .legend-line { width: 24px; height: 2px; background: repeating-linear-gradient(90deg,#38bdf8 0,#38bdf8 5px,transparent 5px,transparent 9px); flex-shrink: 0; }
     .legend-pulse {
-      width: 12px; height: 12px;
-      border-radius: 50%;
-      background: rgba(239,68,68,0.5);
-      border: 2px solid #ef4444;
-      flex-shrink: 0;
+      width: 12px; height: 12px; border-radius: 50%;
+      background: rgba(239,68,68,0.5); border: 2px solid #ef4444; flex-shrink: 0;
       animation: pulse-legend 1.5s ease-out infinite;
     }
-
     @keyframes pulse-legend {
       0%   { box-shadow: 0 0 0 0 rgba(239,68,68,0.6); }
       70%  { box-shadow: 0 0 0 8px rgba(239,68,68,0); }
       100% { box-shadow: 0 0 0 0 rgba(239,68,68,0); }
     }
 
-    /* ── Last updated / sources ───────────────────────────────────── */
-    #last-updated {
-      font-size: 12px;
-      color: var(--accent2);
-      font-weight: 500;
-    }
+    #last-updated { font-size: 12px; color: var(--cyan); font-weight: 500; }
 
     .source-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 4px 0;
-      font-size: 11px;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 5px 0; font-size: 11px;
       border-bottom: 1px solid var(--border);
     }
-
     .source-row:last-child { border-bottom: none; }
     .source-name { color: var(--text); font-weight: 500; }
     .source-time { color: var(--muted); }
+    .source-dot  { width: 6px; height: 6px; border-radius: 50%; background: var(--green); flex-shrink: 0; }
 
-    .source-dot {
-      width: 6px; height: 6px;
-      border-radius: 50%;
-      background: #22c55e;
-      flex-shrink: 0;
-    }
-
-    /* ── Official links ───────────────────────────────────────────── */
     .ext-link {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      padding: 6px 8px;
-      border-radius: 6px;
-      font-size: 12px;
-      color: var(--accent);
-      text-decoration: none;
-      transition: background 0.15s;
+      display: flex; align-items: center; gap: 6px;
+      padding: 7px 8px; border-radius: 6px;
+      font-size: 12px; color: var(--accent); text-decoration: none;
+      transition: background 0.15s; min-height: 36px;
     }
+    .ext-link:hover { background: var(--surface2); color: var(--cyan); }
 
-    .ext-link:hover { background: var(--surface2); color: var(--accent2); }
-
-    /* ── Sidebar footer ───────────────────────────────────────────── */
     #sidebar-footer {
-      padding: 10px 14px;
-      border-top: 1px solid var(--border);
-      font-size: 10px;
-      color: var(--muted);
-      flex-shrink: 0;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+      padding: 10px 14px; border-top: 1px solid var(--border);
+      font-size: 10px; color: var(--muted); flex-shrink: 0;
+      display: flex; justify-content: space-between; align-items: center;
     }
 
-    /* ── Map ──────────────────────────────────────────────────────── */
+    /* ── Map container ── */
     #map-container {
-      flex: 1;
-      min-width: 0;
-      position: relative;
-      height: 100vh;
+      flex: 1; min-width: 0;
+      position: relative; height: 100vh; height: 100dvh;
     }
 
-    #map {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-    }
+    #map { position: absolute; inset: 0; width: 100%; height: 100%; }
 
-    /* ── Staleness banner ─────────────────────────────────────────── */
+    /* ── Staleness banner ── */
     #staleness-warning {
-      display: none;
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      z-index: 9999;
+      display: none; position: fixed;
+      top: 0; left: 0; right: 0; z-index: 9999;
       background: linear-gradient(90deg, #92400e, #b45309);
-      color: #fef3c7;
-      text-align: center;
-      padding: 8px 16px;
-      font-size: 12px;
-      font-weight: 600;
+      color: #fef3c7; text-align: center;
+      padding: 8px 16px; font-size: 12px; font-weight: 600;
     }
-
     #staleness-warning.visible { display: block; }
 
-    /* ── Map overlays ─────────────────────────────────────────────── */
+    /* ── Map overlay ── */
     #map-overlay-top {
-      position: absolute;
-      top: 12px; right: 12px;
-      z-index: 1000;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      pointer-events: none;
+      position: absolute; top: 12px; right: 12px;
+      z-index: 1000; pointer-events: none;
     }
 
     .map-badge {
-      background: rgba(10,14,26,0.85);
-      backdrop-filter: blur(8px);
+      background: rgba(10,14,26,0.88);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
       border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 8px 12px;
-      font-size: 11px;
-      color: var(--text);
-      pointer-events: auto;
+      border-radius: 8px; padding: 7px 12px;
+      font-size: 11px; color: var(--text);
+      pointer-events: auto; white-space: nowrap;
     }
+    .map-badge strong { color: var(--cyan); }
 
-    .map-badge strong { color: var(--accent2); }
-
-    /* ── Pulse animation ──────────────────────────────────────────── */
+    /* ── Pulse marker ── */
     @keyframes pulse-ring-anim {
       0%   { transform: scale(1); opacity: 0.8; }
       70%  { transform: scale(2.5); opacity: 0; }
       100% { transform: scale(2.5); opacity: 0; }
     }
-
-    .pulse-marker {
-      width: 14px; height: 14px;
-      border-radius: 50%;
-      position: relative;
-    }
-
+    .pulse-marker { width: 14px; height: 14px; border-radius: 50%; position: relative; }
     .pulse-marker::after {
-      content: '';
-      position: absolute;
-      inset: -3px;
-      border-radius: 50%;
-      border: 2px solid currentColor;
+      content: ''; position: absolute; inset: -3px;
+      border-radius: 50%; border: 2px solid currentColor;
       animation: pulse-ring-anim 1.8s ease-out infinite;
     }
 
-    /* ── Leaflet popup dark theme ─────────────────────────────────── */
+    /* ── Leaflet dark theme ── */
     .leaflet-popup-content-wrapper {
-      background: #111827 !important;
-      border: 1px solid #1e2d45 !important;
-      border-radius: 10px !important;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.6) !important;
+      background: #111827 !important; border: 1px solid #1e2d45 !important;
+      border-radius: 10px !important; box-shadow: 0 8px 32px rgba(0,0,0,0.6) !important;
       color: #e2e8f0 !important;
     }
-
     .leaflet-popup-tip { background: #111827 !important; }
-
-    .leaflet-popup-close-button {
-      color: #64748b !important;
-      font-size: 18px !important;
-      top: 6px !important; right: 8px !important;
-    }
-
+    .leaflet-popup-close-button { color: #64748b !important; font-size: 18px !important; top: 6px !important; right: 8px !important; }
     .leaflet-popup-close-button:hover { color: #e2e8f0 !important; }
-
-    /* ── Cluster icons ────────────────────────────────────────────── */
-    .marker-cluster-small,
-    .marker-cluster-medium,
-    .marker-cluster-large {
-      background: rgba(59,130,246,0.15) !important;
-      border: 2px solid rgba(59,130,246,0.5) !important;
-    }
-
-    .marker-cluster-small div,
-    .marker-cluster-medium div,
-    .marker-cluster-large div {
-      background: rgba(59,130,246,0.3) !important;
-      color: #93c5fd !important;
-      font-weight: 700 !important;
-      font-size: 12px !important;
-    }
-
-    /* ── Tooltip dark ─────────────────────────────────────────────── */
     .leaflet-tooltip {
-      background: rgba(10,14,26,0.9) !important;
-      border: 1px solid var(--border) !important;
-      color: var(--text) !important;
-      font-size: 11px !important;
-      border-radius: 6px !important;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.4) !important;
+      background: rgba(10,14,26,0.92) !important; border: 1px solid var(--border) !important;
+      color: var(--text) !important; font-size: 11px !important;
+      border-radius: 6px !important; box-shadow: 0 4px 12px rgba(0,0,0,0.4) !important;
+    }
+    .leaflet-tooltip-top::before { border-top-color: var(--border) !important; }
+    .marker-cluster-small, .marker-cluster-medium, .marker-cluster-large {
+      background: rgba(59,130,246,0.15) !important; border: 2px solid rgba(59,130,246,0.5) !important;
+    }
+    .marker-cluster-small div, .marker-cluster-medium div, .marker-cluster-large div {
+      background: rgba(59,130,246,0.3) !important; color: #93c5fd !important;
+      font-weight: 700 !important; font-size: 12px !important;
     }
 
-    .leaflet-tooltip-top::before { border-top-color: var(--border) !important; }
+    /* ═══════════════════════════════════════════════════════════════
+       MOBILE LAYOUT  (< 768px)
+       - Map fills full screen
+       - Floating header bar at top
+       - Bottom drawer (peek + full open)
+    ═══════════════════════════════════════════════════════════════ */
+    @media (max-width: 767px) {
+      #app { flex-direction: column; }
 
-    /* ── Responsive: collapse sidebar on small screens ────────────── */
-    @media (max-width: 640px) {
-      #sidebar { display: none; }
-      #sidebar.open { display: flex; position: fixed; z-index: 100; }
-      #mobile-toggle {
+      /* Sidebar becomes a bottom drawer */
+      #sidebar {
+        position: fixed;
+        bottom: 0; left: 0; right: 0;
+        width: 100%; min-width: unset;
+        height: auto;
+        max-height: 85dvh;
+        border-right: none;
+        border-top: 1px solid var(--border);
+        border-radius: 16px 16px 0 0;
+        transform: translateY(calc(100% - var(--drawer-peek)));
+        z-index: 500;
+        box-shadow: 0 -8px 40px rgba(0,0,0,0.6);
+        transition: transform 0.35s cubic-bezier(0.4,0,0.2,1);
+      }
+
+      #sidebar.drawer-open {
+        transform: translateY(0);
+      }
+
+      /* Drag handle */
+      #sidebar-header {
+        border-radius: 16px 16px 0 0;
+        padding: 0;
+        cursor: pointer;
+        position: relative;
+      }
+
+      #drawer-handle {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 10px 16px 8px;
+        background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+        border-radius: 16px 16px 0 0;
+        gap: 8px;
+      }
+
+      .handle-bar {
+        width: 36px; height: 4px;
+        background: rgba(255,255,255,0.2);
+        border-radius: 2px;
+      }
+
+      .drawer-header-row {
+        display: flex; align-items: center;
+        justify-content: space-between;
+        width: 100%;
+      }
+
+      /* Map fills full screen on mobile */
+      #map-container {
+        position: fixed; inset: 0;
+        height: 100dvh; z-index: 1;
+      }
+
+      /* Floating top bar on mobile */
+      #mobile-topbar {
         display: flex;
         position: fixed;
-        top: 12px; left: 12px;
-        z-index: 200;
-        background: rgba(10,14,26,0.9);
-        border: 1px solid var(--border);
-        border-radius: 8px;
-        padding: 8px 10px;
-        color: var(--text);
-        cursor: pointer;
-        font-size: 18px;
+        top: 0; left: 0; right: 0;
+        z-index: 400;
+        background: rgba(10,14,26,0.92);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border-bottom: 1px solid var(--border);
+        padding: 0 12px;
+        height: var(--header-h);
         align-items: center;
-        justify-content: center;
+        gap: 10px;
       }
+
+      .mobile-logo { display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0; }
+      .mobile-logo-icon {
+        width: 28px; height: 28px;
+        background: radial-gradient(circle, #ef4444 0%, #7f1d1d 100%);
+        border-radius: 50%; display: flex; align-items: center; justify-content: center;
+        font-size: 14px; box-shadow: 0 0 10px rgba(239,68,68,0.4); flex-shrink: 0;
+      }
+      .mobile-logo-text { min-width: 0; }
+      .mobile-logo-text h1 { font-size: 13px; font-weight: 700; color: #f1f5f9; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+      .mobile-logo-text p  { font-size: 10px; color: #f59e0b; }
+
+      /* Mobile stats inline */
+      #mobile-stats {
+        display: flex; gap: 8px; flex-shrink: 0;
+      }
+      .mobile-stat { text-align: center; }
+      .mobile-stat-num { font-size: 14px; font-weight: 700; line-height: 1; }
+      .mobile-stat-lbl { font-size: 8px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted); }
+      .ms-confirmed .mobile-stat-num { color: var(--red); }
+      .ms-probable  .mobile-stat-num { color: var(--orange); }
+      .ms-suspected .mobile-stat-num { color: var(--yellow); }
+
+      /* Hide desktop stats bar on mobile */
+      #stats-bar { display: none; }
+
+      /* Adjust map overlay to not overlap topbar */
+      #map-overlay-top { top: calc(var(--header-h) + 8px); right: 8px; }
+
+      /* Sidebar body scrollable */
+      #sidebar-body { max-height: calc(85dvh - var(--drawer-peek) - 20px); }
+
+      /* Sidebar footer hidden on mobile (info in topbar) */
+      #sidebar-footer { display: none; }
     }
 
-    @media (min-width: 641px) {
-      #mobile-toggle { display: none; }
+    /* Desktop: hide mobile-only elements */
+    @media (min-width: 768px) {
+      #mobile-topbar { display: none; }
+      #drawer-handle  { display: none; }
     }
   </style>
 </head>
 <body>
-
-  <!-- Mobile toggle -->
-  <button id="mobile-toggle" aria-label="Toggle sidebar" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
 
   <!-- Staleness Warning -->
   <div id="staleness-warning" role="alert" aria-live="assertive">
     ⚠ Data may be outdated — last update was more than 24 hours ago.
   </div>
 
+  <!-- Mobile top bar (hidden on desktop) -->
+  <div id="mobile-topbar" role="banner">
+    <div class="mobile-logo">
+      <div class="mobile-logo-icon" aria-hidden="true">🦠</div>
+      <div class="mobile-logo-text">
+        <h1>Hantavirus Tracker</h1>
+        <p>Live Surveillance</p>
+      </div>
+    </div>
+    <div id="mobile-stats" aria-label="Case counts">
+      <div class="mobile-stat ms-confirmed">
+        <div class="mobile-stat-num" id="m-count-confirmed">—</div>
+        <div class="mobile-stat-lbl">Conf.</div>
+      </div>
+      <div class="mobile-stat ms-probable">
+        <div class="mobile-stat-num" id="m-count-probable">—</div>
+        <div class="mobile-stat-lbl">Prob.</div>
+      </div>
+      <div class="mobile-stat ms-suspected">
+        <div class="mobile-stat-num" id="m-count-suspected">—</div>
+        <div class="mobile-stat-lbl">Susp.</div>
+      </div>
+    </div>
+  </div>
+
   <div id="app">
-    <!-- ── Sidebar ─────────────────────────────────────────────── -->
+
+    <!-- ── Sidebar / Bottom Drawer ── -->
     <aside id="sidebar" role="complementary" aria-label="Tracker controls">
 
-      <!-- Header -->
-      <div id="sidebar-header">
-        <div class="logo-row">
-          <div class="logo-icon" aria-hidden="true">🦠</div>
-          <div class="logo-text">
-            <h1>Hantavirus Tracker</h1>
-            <p>⚡ Live Global Surveillance</p>
+      <!-- Desktop header / Mobile drag handle -->
+      <div id="sidebar-header" onclick="toggleDrawer()">
+        <!-- Mobile handle (hidden on desktop via CSS) -->
+        <div id="drawer-handle">
+          <div class="handle-bar" aria-hidden="true"></div>
+          <div class="drawer-header-row">
+            <span style="font-size:12px;font-weight:600;color:#f1f5f9;">Filters &amp; Info</span>
+            <span id="drawer-chevron" style="font-size:14px;color:var(--muted);transition:transform 0.3s;">▲</span>
+          </div>
+        </div>
+        <!-- Desktop header (hidden on mobile via CSS) -->
+        <div style="padding:16px 16px 12px;">
+          <div class="logo-row">
+            <div class="logo-icon" aria-hidden="true">🦠</div>
+            <div class="logo-text">
+              <h1>Hantavirus Tracker</h1>
+              <p>⚡ Live Global Surveillance</p>
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- Stats bar -->
+      <!-- Desktop stats bar -->
       <div id="stats-bar" aria-label="Case counts">
         <div class="stat-cell stat-confirmed">
           <div class="stat-num" id="count-confirmed">—</div>
-          <div class="stat-label">Confirmed</div>
+          <div class="stat-lbl">Confirmed</div>
         </div>
         <div class="stat-cell stat-probable">
           <div class="stat-num" id="count-probable">—</div>
-          <div class="stat-label">Probable</div>
+          <div class="stat-lbl">Probable</div>
         </div>
         <div class="stat-cell stat-suspected">
           <div class="stat-num" id="count-suspected">—</div>
-          <div class="stat-label">Suspected</div>
+          <div class="stat-lbl">Suspected</div>
         </div>
       </div>
 
       <!-- Scrollable body -->
       <div id="sidebar-body">
 
-        <!-- Disclaimer -->
         <div id="disclaimer" role="note" aria-label="Medical disclaimer">
           <strong>⚠ Medical Disclaimer</strong>
           For informational purposes only. Data may be incomplete or delayed.
           Consult a healthcare professional for medical advice.
         </div>
 
-        <!-- Filters -->
         <section aria-labelledby="filters-heading">
           <div class="section-title" id="filters-heading">Filters</div>
-          <div id="filter-controls" class="filter-group">
-            <!-- Populated by filters.js -->
-          </div>
+          <div id="filter-controls" class="filter-group"></div>
         </section>
 
-        <!-- Legend -->
         <section aria-labelledby="legend-heading">
           <div class="section-title" id="legend-heading">Legend</div>
           <div style="display:flex;flex-direction:column;gap:6px;">
-            <div class="legend-item">
-              <div class="legend-dot" style="background:#ef4444;" aria-hidden="true"></div>
-              <span>Confirmed</span>
-            </div>
-            <div class="legend-item">
-              <div class="legend-dot" style="background:#f97316;" aria-hidden="true"></div>
-              <span>Probable</span>
-            </div>
-            <div class="legend-item">
-              <div class="legend-dot" style="background:#eab308;" aria-hidden="true"></div>
-              <span>Suspected</span>
-            </div>
-            <div class="legend-item">
-              <div class="legend-pulse" aria-hidden="true"></div>
-              <span>Andes virus (pulsing)</span>
-            </div>
-            <div class="legend-item">
-              <div class="legend-line" aria-hidden="true"></div>
-              <span>MV Hondius route</span>
-            </div>
+            <div class="legend-item"><div class="legend-dot" style="background:#ef4444;" aria-hidden="true"></div><span>Confirmed</span></div>
+            <div class="legend-item"><div class="legend-dot" style="background:#f97316;" aria-hidden="true"></div><span>Probable</span></div>
+            <div class="legend-item"><div class="legend-dot" style="background:#eab308;" aria-hidden="true"></div><span>Suspected</span></div>
+            <div class="legend-item"><div class="legend-pulse" aria-hidden="true"></div><span>Andes virus (pulsing)</span></div>
+            <div class="legend-item"><div class="legend-line" aria-hidden="true"></div><span>MV Hondius route</span></div>
           </div>
         </section>
 
-        <!-- Last updated -->
         <section aria-labelledby="updated-heading">
           <div class="section-title" id="updated-heading">Last Updated</div>
           <div id="last-updated" aria-live="polite">Loading…</div>
         </section>
 
-        <!-- Data sources -->
         <section aria-labelledby="sources-heading">
           <div class="section-title" id="sources-heading">Data Sources</div>
           <div id="source-timestamps" aria-live="polite">
@@ -592,59 +516,79 @@
           </div>
         </section>
 
-        <!-- Official links -->
         <section aria-labelledby="links-heading">
           <div class="section-title" id="links-heading">Official Sources</div>
           <div style="display:flex;flex-direction:column;gap:2px;">
-            <a class="ext-link" href="https://www.who.int/emergencies/disease-outbreak-news"
-               target="_blank" rel="noopener" aria-label="WHO Disease Outbreak News">
-              🌐 WHO Disease Outbreak News ↗
-            </a>
-            <a class="ext-link" href="https://www.cdc.gov/hantavirus/"
-               target="_blank" rel="noopener" aria-label="CDC Hantavirus">
-              🇺🇸 CDC Hantavirus ↗
-            </a>
-            <a class="ext-link" href="https://www.ecdc.europa.eu/en/hantavirus-infection"
-               target="_blank" rel="noopener" aria-label="ECDC Hantavirus">
-              🇪🇺 ECDC Hantavirus ↗
-            </a>
+            <a class="ext-link" href="https://www.who.int/emergencies/disease-outbreak-news" target="_blank" rel="noopener">🌐 WHO Disease Outbreak News ↗</a>
+            <a class="ext-link" href="https://www.cdc.gov/hantavirus/" target="_blank" rel="noopener">🇺🇸 CDC Hantavirus ↗</a>
+            <a class="ext-link" href="https://www.ecdc.europa.eu/en/hantavirus-infection" target="_blank" rel="noopener">🇪🇺 ECDC Hantavirus ↗</a>
           </div>
         </section>
 
-      </div><!-- /sidebar-body -->
+      </div>
 
-      <!-- Footer -->
       <div id="sidebar-footer">
         <span>Updates every 4h · Not for clinical use</span>
-        <a href="https://github.com/EliseyRotar/hantavirus-tracker"
-           target="_blank" rel="noopener"
-           style="color:var(--muted);text-decoration:none;"
-           aria-label="GitHub repository">GitHub ↗</a>
+        <a href="https://github.com/EliseyRotar/hantavirus-tracker" target="_blank" rel="noopener" style="color:var(--muted);text-decoration:none;">GitHub ↗</a>
       </div>
 
     </aside>
 
-    <!-- ── Map ─────────────────────────────────────────────────── -->
-    <main id="map-container" style="flex:1;min-width:0;position:relative;height:100vh;">
-
-      <!-- Map overlay badge -->
+    <!-- ── Map ── -->
+    <main id="map-container" style="flex:1;min-width:0;position:relative;height:100vh;height:100dvh;">
       <div id="map-overlay-top">
-        <div class="map-badge">
-          <strong id="visible-count">—</strong> cases visible
-        </div>
+        <div class="map-badge"><strong id="visible-count">—</strong> cases visible</div>
       </div>
-
-      <div id="map"
-           role="application"
-           aria-label="Live hantavirus case map"
-           tabindex="0">
-      </div>
+      <div id="map" role="application" aria-label="Live hantavirus case map" tabindex="0"></div>
     </main>
+
   </div>
 
   <!-- Leaflet JS -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
   <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js" crossorigin=""></script>
+
+  <script>
+    // ── Drawer toggle ──────────────────────────────────────────────
+    var drawerOpen = false;
+    function toggleDrawer() {
+      if (window.innerWidth >= 768) return;
+      drawerOpen = !drawerOpen;
+      var sidebar  = document.getElementById('sidebar');
+      var chevron  = document.getElementById('drawer-chevron');
+      if (drawerOpen) {
+        sidebar.classList.add('drawer-open');
+        if (chevron) chevron.style.transform = 'rotate(180deg)';
+      } else {
+        sidebar.classList.remove('drawer-open');
+        if (chevron) chevron.style.transform = '';
+      }
+    }
+
+    // Close drawer when tapping the map
+    document.addEventListener('DOMContentLoaded', function () {
+      var mapEl = document.getElementById('map');
+      if (mapEl) {
+        mapEl.addEventListener('click', function () {
+          if (drawerOpen && window.innerWidth < 768) {
+            drawerOpen = false;
+            document.getElementById('sidebar').classList.remove('drawer-open');
+            var ch = document.getElementById('drawer-chevron');
+            if (ch) ch.style.transform = '';
+          }
+        });
+      }
+    });
+
+    // Sync mobile stat counts
+    window.updateMobileStats = function (counts) {
+      ['confirmed','probable','suspected'].forEach(function (s) {
+        var el = document.getElementById('m-count-' + s);
+        if (el && counts[s[0].toUpperCase() + s.slice(1)] !== undefined)
+          el.textContent = counts[s[0].toUpperCase() + s.slice(1)];
+      });
+    };
+  </script>
 
   <script src="js/ui.js"></script>
   <script src="js/filters.js"></script>
