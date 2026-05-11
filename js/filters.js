@@ -8,7 +8,7 @@
 
   /* Shared filter state */
   var state = {
-    statuses:  new Set(['Confirmed', 'Suspected', 'Deceased', 'Monitoring']),
+    statuses:  new Set(['Confirmed', 'Suspected', 'Deceased', 'Monitoring', 'Unknown']),
     dateStart: null,
     dateEnd:   null,
   };
@@ -18,6 +18,7 @@
     { val: 'Suspected',  color: '#f97316' },
     { val: 'Deceased',   color: '#8b5cf6' },
     { val: 'Monitoring', color: '#0ea5e9' },
+    { val: 'Unknown',    color: '#64748b' },
   ];
 
   /* ── Apply filters and update map + stats ── */
@@ -54,7 +55,7 @@
     }
 
     /* Count by status */
-    var counts = { Confirmed: 0, Suspected: 0, Deceased: 0, Monitoring: 0 };
+    var counts = { Confirmed: 0, Suspected: 0, Deceased: 0, Monitoring: 0, Unknown: 0 };
     filtered.forEach(function (f) {
       var s = (f.properties || {}).status;
       if (s && counts[s] !== undefined) counts[s]++;
@@ -166,7 +167,7 @@
       textContent: '↺  Reset Filters',
     });
     resetBtn.addEventListener('click', function () {
-      state.statuses  = new Set(['Confirmed', 'Suspected', 'Deceased', 'Monitoring']);
+      state.statuses  = new Set(['Confirmed', 'Suspected', 'Deceased', 'Monitoring', 'Unknown']);
       state.dateStart = null;
       state.dateEnd   = null;
       /* Reset all checkboxes and date inputs in both panels */
