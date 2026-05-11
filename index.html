@@ -1012,7 +1012,7 @@
       10: 'American national. Tested positive May 10; reported asymptomatic in Nebraska, USA.'
     };
 
-    function openCasePanel(data) {
+    window.openCasePanel = function openCasePanel(data) {
       var panel = document.getElementById('case-panel');
       if (!panel) return;
 
@@ -1085,7 +1085,7 @@
       document.getElementById('case-panel-close').focus();
     }
 
-    function closeCasePanel() {
+    window.closeCasePanel = function closeCasePanel() {
       var panel = document.getElementById('case-panel');
       if (!panel) return;
       panel.classList.remove('open');
