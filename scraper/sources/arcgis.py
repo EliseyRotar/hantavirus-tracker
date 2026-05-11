@@ -25,6 +25,7 @@ _ARCGIS_URL = (
     "https://services1.arcgis.com/wb4Og4gH5mvzQAIV/arcgis/rest/services/"
     "Tracking_Hantavirus_2026/FeatureServer/1/query"
     "?where=1%3D1&outFields=*&f=geojson&returnGeometry=true&orderByFields=CASE_%20ASC"
+    "&resultRecordCount=500"
 )
 
 _STATUS_MAP = {

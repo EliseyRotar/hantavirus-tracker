@@ -11,7 +11,7 @@
   var ARCGIS_URL =
     'https://services1.arcgis.com/wb4Og4gH5mvzQAIV/arcgis/rest/services/' +
     'Tracking_Hantavirus_2026/FeatureServer/1/query' +
-    '?where=1%3D1&outFields=*&f=geojson&returnGeometry=true&orderByFields=CASE_%20ASC';
+    '?where=1%3D1&outFields=*&f=geojson&returnGeometry=true&orderByFields=CASE_%20ASC&resultRecordCount=500';
 
   /* ── MV Hondius route waypoints ── */
   var MV_HONDIUS_ROUTE = [
@@ -50,8 +50,91 @@
     return d.toLocaleDateString('en-GB', { year: 'numeric', month: 'short', day: 'numeric' });
   }
 
-  /* ── Shared state ── */
-  window.mapState = { allFeatures: [], clusterGroup: null, map: null };
+  /* ── Location lookup for UNKNOWN/None cases ── */
+  var LOCATION_COORDS = {
+    'ITALY':          [41.9, 12.5],
+    'FINLAND':        [61.9, 25.7],
+    'DENMARK':        [56.0, 10.0],
+    'SWEDEN':         [59.3, 18.1],
+    'SPAIN':          [40.4, -3.7],
+    'FRANCE':         [46.2, 2.2],
+    'GERMANY':        [51.2, 10.5],
+    'NETHERLANDS':    [52.1, 5.3],
+    'BELGIUM':        [50.5, 4.5],
+    'SWITZERLAND':    [47.4, 8.5],
+    'UNITED KINGDOM': [51.5, -0.1],
+    'UK':             [51.5, -0.1],
+    'IRELAND':        [53.4, -8.2],
+    'GREECE':         [39.1, 21.8],
+    'TURKEY':         [39.9, 32.9],
+    'PORTUGAL':       [39.4, -8.2],
+    'POLAND':         [52.2, 21.0],
+    'RUSSIA':         [55.8, 37.6],
+    'UKRAINE':        [50.4, 30.5],
+    'SOUTH AFRICA':   [-26.2, 28.0],
+    'JOHANNESBURG':   [-26.2, 28.0],
+    'SINGAPORE':      [1.35, 103.8],
+    'AUSTRALIA':      [-25.3, 133.8],
+    'NEW ZEALAND':    [-40.9, 174.9],
+    'CANADA':         [56.1, -106.3],
+    'UNITED STATES':  [37.1, -95.7],
+    'USA':            [37.1, -95.7],
+    'NEBRASKA, USA':  [41.5, -99.9],
+    'GEORGIA, USA':   [32.2, -83.4],
+    'TEXAS':          [31.0, -100.0],
+    'CALIFORNIA':     [36.8, -119.4],
+    'ARIZONA, USA':   [34.0, -111.1],
+    'VIRGINIA':       [37.4, -78.7],
+    'NEW JERSEY':     [40.1, -74.7],
+    'ARGENTINA':      [-34.6, -58.4],
+    'USHUAIA':        [-54.8, -68.3],
+    'JAPAN':          [36.2, 138.3],
+    'INDIA':          [20.6, 78.9],
+    'PHILIPPINES':    [12.9, 121.8],
+    'GUATEMALA':      [15.8, -90.2],
+    'MONTENEGRO':     [42.7, 19.4],
+    'SAINT KITTS AND NEVIS': [17.3, -62.7],
+    'TRISTAN DA CUNHA': [-37.1, -12.3],
+    'ST HELENA':      [-15.9, -5.7],
+    'PRAIA, CAPE VERDE': [14.9, -23.5],
+    'ALICANTE, SPAIN': [38.3, -0.5],
+    'ZURICH':         [47.4, 8.5],
+    'MV HONDIUS':     [28.1, -15.4],
+    'MV HONDUS':      [28.1, -15.4],
+  };
+
+  function resolveCoords(props, geomCoords) {
+    /* If geometry coords are valid WGS84, use them */
+    if (geomCoords && geomCoords.length >= 2) {
+      var lon = geomCoords[0], lat = geomCoords[1];
+      if (lon >= -180 && lon <= 180 && lat >= -90 && lat <= 90 && (lon !== 0 || lat !== 0)) {
+        return geomCoords;
+      }
+    }
+    /* Try to resolve from LASTLOCATION */
+    var loc = (props.LASTLOCATION || props.location_name || '').toUpperCase().trim();
+    if (loc && LOCATION_COORDS[loc]) {
+      var c = LOCATION_COORDS[loc];
+      return [c[1], c[0]]; // [lon, lat]
+    }
+    /* Try partial match */
+    var keys = Object.keys(LOCATION_COORDS);
+    for (var i = 0; i < keys.length; i++) {
+      if (loc.indexOf(keys[i]) !== -1 || keys[i].indexOf(loc) !== -1) {
+        var c2 = LOCATION_COORDS[keys[i]];
+        return [c2[1], c2[0]];
+      }
+    }
+    /* Try from DETAILS text */
+    var details = (props.DETAILS || '').toUpperCase();
+    for (var j = 0; j < keys.length; j++) {
+      if (details.indexOf(keys[j]) !== -1) {
+        var c3 = LOCATION_COORDS[keys[j]];
+        return [c3[1], c3[0]];
+      }
+    }
+    return null; // truly unknown, skip
+  }
 
   /* ── Update visible-count badge ── */
   function updateVisibleCount(n) {
@@ -122,11 +205,17 @@
     var cg = window.mapState.clusterGroup;
     if (!cg) return;
     cg.clearLayers();
+    var shown = 0;
     features.forEach(function (f) {
-      if (!f.geometry || !f.geometry.coordinates || f.geometry.coordinates.length < 2) return;
+      if (!f.geometry) return;
+      var coords = resolveCoords(f.properties, f.geometry.coordinates);
+      if (!coords) return; // truly no location data
+      /* Patch the geometry so createMarker uses resolved coords */
+      f.geometry.coordinates = coords;
       cg.addLayer(createMarker(f));
+      shown++;
     });
-    updateVisibleCount(features.length);
+    updateVisibleCount(shown);
   };
 
   /* ── Initialise Leaflet map ── */
@@ -157,11 +246,12 @@
 
     L.control.zoom({ position: 'bottomright' }).addTo(map);
 
-    /* Cluster group */
+    /* Cluster group — disable clustering at low zoom so all dots visible */
     var clusterGroup = L.markerClusterGroup({
-      maxClusterRadius:    60,
-      showCoverageOnHover: false,
-      spiderfyOnMaxZoom:   true,
+      maxClusterRadius:        40,
+      showCoverageOnHover:     false,
+      spiderfyOnMaxZoom:       true,
+      disableClusteringAtZoom: 5,
       iconCreateFunction: function (cluster) {
         var n    = cluster.getChildCount();
         var size = n >= 20 ? 44 : n >= 10 ? 38 : 32;
@@ -229,9 +319,20 @@
   /* ── Normalise feature properties ── */
   function normaliseFeature(f) {
     var p = f.properties;
-    /* Add lowercase/normalised aliases so filters.js works with both sources */
     p.status        = titleCase(p.STATUS || p.status || 'Unknown');
-    p.location_name = p.LASTLOCATION || p.location_name || 'Unknown';
+    /* For UNKNOWN location, try to infer from DETAILS */
+    var loc = p.LASTLOCATION || p.location_name || '';
+    if (!loc || loc === 'None' || loc.toUpperCase() === 'UNKNOWN') {
+      var details = (p.DETAILS || '').toUpperCase();
+      var keys = Object.keys(LOCATION_COORDS);
+      for (var i = 0; i < keys.length; i++) {
+        if (details.indexOf(keys[i]) !== -1) {
+          loc = keys[i].charAt(0) + keys[i].slice(1).toLowerCase();
+          break;
+        }
+      }
+    }
+    p.location_name = loc || 'Unknown location';
     p.date_reported = p.ONSET        || p.date_reported || null;
     p.source        = p.SOURCE       || p.source        || 'ArcGIS';
     p.virus_strain  = 'Andes';
