@@ -7,10 +7,8 @@ Returns a list of error strings — an empty list means the case is valid.
 
 from __future__ import annotations
 
+from scraper.constants import VALID_STATUSES
 from scraper.models import Case
-
-# Valid status values (mirrors Case.VALID_STATUSES for clarity)
-_VALID_STATUSES = frozenset({"Confirmed", "Probable", "Suspected"})
 
 
 def validate_case(case: Case) -> list[str]:
@@ -47,9 +45,9 @@ def validate_case(case: Case) -> list[str]:
             "status must be a non-empty string; "
             f"got {case.status!r}"
         )
-    elif case.status not in _VALID_STATUSES:
+    elif case.status not in VALID_STATUSES:
         errors.append(
-            f"status must be one of {sorted(_VALID_STATUSES)}; "
+            f"status must be one of {sorted(VALID_STATUSES)}; "
             f"got {case.status!r}"
         )
 

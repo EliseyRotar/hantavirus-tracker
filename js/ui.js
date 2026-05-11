@@ -49,23 +49,30 @@
     });
   }
 
-  /* ── Source timestamps (desktop sidebar only) ── */
-  function updateSources(sourceTimestamps) {
+  /* ── Source status panel (desktop sidebar only) ── */
+  function updateSources(sourceStats) {
     var el = document.getElementById('source-timestamps');
     if (!el) return;
-    if (!sourceTimestamps || !Object.keys(sourceTimestamps).length) {
+    if (!sourceStats || !Object.keys(sourceStats).length) {
       el.innerHTML = '<div class="source-row"><span class="source-name" style="color:#64748b;">No data</span></div>';
       return;
     }
-    el.innerHTML = Object.entries(sourceTimestamps).map(function (e) {
-      var id = e[0], ts = e[1];
+    el.innerHTML = Object.entries(sourceStats).map(function (e) {
+      var id = e[0], stats = e[1];
+      var status = stats.status || 'ok';
+      var ts = stats.verified_at || '';
       var rel = relTime(ts);
+      var dotColor = status === 'ok' ? '#22c55e' : '#ef4444';
+      var statusText = status === 'ok' ? (rel || fmtDate(ts)) : 'Error';
+      
       return '<div class="source-row">' +
         '<div style="display:flex;align-items:center;gap:6px;">' +
-          '<div class="source-dot"></div>' +
+          '<div class="source-dot" style="background:' + dotColor + ';"></div>' +
           '<span class="source-name">' + esc(id) + '</span>' +
         '</div>' +
-        '<span class="source-time" title="' + esc(ts) + '">' + esc(rel || fmtDate(ts)) + '</span>' +
+        '<span class="source-time" title="' + esc(ts + (stats.error ? '\nError: ' + stats.error : '')) + '">' + 
+          esc(statusText) + 
+        '</span>' +
         '</div>';
     }).join('');
   }
@@ -85,7 +92,7 @@
   document.addEventListener('geojsonloaded', function (e) {
     var meta = ((e && e.detail) || {}).metadata || {};
     updateLastUpdated(meta.generated_at);
-    updateSources(meta.source_timestamps);
+    updateSources(meta.source_stats || meta.source_timestamps);
     updateStaleness(meta.generated_at);
   });
 })();

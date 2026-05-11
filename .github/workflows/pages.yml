@@ -27,6 +27,19 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          pip install -r scraper/requirements.txt
+          pip install pytest hypothesis
+
+      - name: Run tests
+        run: pytest scraper/tests/
+
       - name: Setup Pages
         uses: actions/configure-pages@v5
 

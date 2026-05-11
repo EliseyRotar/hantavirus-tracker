@@ -73,7 +73,7 @@ def _case_to_feature(case: Case) -> dict[str, Any]:
 
 def serialize_cases(
     cases: list[Case],
-    source_timestamps: dict[str, str],
+    source_stats: dict[str, dict[str, Any]],
 ) -> dict[str, Any]:
     """Serialize a list of Case objects into a GeoJSON FeatureCollection dict.
 
@@ -81,9 +81,9 @@ def serialize_cases(
     ----------
     cases:
         List of Case objects to serialize.
-    source_timestamps:
-        Mapping of source identifier to ISO 8601 timestamp of the last
-        successful fetch for that source (e.g. ``{"WHO": "2026-05-10T12:00:00Z"}``).
+    source_stats:
+        Mapping of source identifier to a dict containing stats like
+        ``verified_at`` and ``status``.
 
     Returns
     -------
@@ -97,7 +97,7 @@ def serialize_cases(
         "type": "FeatureCollection",
         "metadata": {
             "generated_at": generated_at,
-            "source_timestamps": dict(source_timestamps),
+            "source_stats": dict(source_stats),
         },
         "features": [_case_to_feature(case) for case in cases],
     }
@@ -105,7 +105,7 @@ def serialize_cases(
 
 def write_geojson(
     cases: list[Case],
-    source_timestamps: dict[str, str],
+    source_stats: dict[str, dict[str, Any]],
     path: str,
 ) -> None:
     """Serialize cases to GeoJSON and write the result to a file.
@@ -114,14 +114,13 @@ def write_geojson(
     ----------
     cases:
         List of Case objects to serialize.
-    source_timestamps:
-        Mapping of source identifier to ISO 8601 timestamp of the last
-        successful fetch for that source.
+    source_stats:
+        Mapping of source identifier to status/timestamp metadata.
     path:
         Filesystem path where the GeoJSON file will be written.
         The file is created or overwritten.
     """
-    geojson = serialize_cases(cases, source_timestamps)
+    geojson = serialize_cases(cases, source_stats)
     with open(path, "w", encoding="utf-8") as fh:
         json.dump(geojson, fh, indent=2, ensure_ascii=False)
         fh.write("\n")  # trailing newline for POSIX compatibility

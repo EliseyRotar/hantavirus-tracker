@@ -21,6 +21,7 @@
 
   var STATUS_COLORS = {
     CONFIRMED:  '#ef4444',
+    PROBABLE:   '#facc15',
     SUSPECTED:  '#f97316',
     DECEASED:   '#8b5cf6',
     MONITORING: '#0ea5e9',

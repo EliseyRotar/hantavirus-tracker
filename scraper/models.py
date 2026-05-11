@@ -5,7 +5,13 @@ Defines the Case dataclass representing a single hantavirus case entry,
 as specified in the design document.
 """
 
+from __future__ import annotations
 from dataclasses import dataclass, field
+
+# VALID_STATUSES is imported here so that other modules can still access 
+# it via Case.VALID_STATUSES if they were doing so, though they should 
+# migrate to constants.py.
+from scraper.constants import VALID_STATUSES
 
 
 @dataclass
@@ -19,7 +25,7 @@ class Case:
         Deterministic hash of (source, location_name, date_reported).
         Used for deduplication and stable identification across runs.
     status : str
-        One of "Confirmed", "Probable", or "Suspected".
+        One of "Confirmed", "Probable", or "Suspected", "Deceased", "Monitoring".
     date_reported : str
         ISO 8601 date string (e.g. "2026-05-01").
     source : str
@@ -39,15 +45,15 @@ class Case:
     """
 
     case_id: str
-    status: str           # "Confirmed" | "Probable" | "Suspected"
-    date_reported: str    # ISO 8601 date string
-    source: str           # source identifier
+    status: str
+    date_reported: str
+    source: str
     latitude: float
     longitude: float
     location_name: str
-    virus_strain: str     # e.g. "Andes", "Sin Nombre", "Unknown"
-    source_verified_at: str  # ISO 8601 timestamp of last successful fetch
+    virus_strain: str
+    source_verified_at: str
     notes: str = field(default="")
 
-    # Valid status values
-    VALID_STATUSES = frozenset({"Confirmed", "Probable", "Suspected"})
+    # Keep this for backward compatibility during transition
+    VALID_STATUSES = VALID_STATUSES

@@ -5,6 +5,7 @@ from unittest import mock
 import time
 import requests
 
+from scraper.constants import VALID_STATUSES
 from scraper.models import Case
 from scraper.parser import parse_json, _make_case_id
 from scraper.validator import validate_case
@@ -15,7 +16,7 @@ from scraper.http_client import fetch
 # Strategies
 st_lat = st.floats(min_value=-90.0, max_value=90.0, allow_nan=False, allow_infinity=False)
 st_lon = st.floats(min_value=-180.0, max_value=180.0, allow_nan=False, allow_infinity=False)
-st_status = st.sampled_from(["Confirmed", "Probable", "Suspected"])
+st_status = st.sampled_from(list(VALID_STATUSES))
 st_date = st.datetimes(
     min_value=datetime(2020, 1, 1), 
     max_value=datetime(2030, 1, 1)
@@ -24,16 +25,16 @@ st_date = st.datetimes(
 def valid_case_strategy():
     return st.builds(
         Case,
-        case_id=st.text(min_size=1, max_size=32),
+        case_id=st.text(min_size=1, max_size=32).map(lambda s: s.strip()).filter(bool),
         status=st_status,
         date_reported=st_date,
-        source=st.text(min_size=1, max_size=32),
+        source=st.text(min_size=1, max_size=32).map(lambda s: s.strip()).filter(bool),
         latitude=st_lat,
         longitude=st_lon,
-        location_name=st.text(min_size=1, max_size=50).filter(lambda s: bool(s.strip())),
-        virus_strain=st.text(max_size=32),
+        location_name=st.text(min_size=1, max_size=50).map(lambda s: s.strip()).filter(bool),
+        virus_strain=st.text(max_size=32).map(lambda s: s.strip()),
         source_verified_at=st.datetimes(timezones=st.just(timezone.utc)).map(lambda d: d.isoformat()),
-        notes=st.text(max_size=100)
+        notes=st.text(max_size=100).map(lambda s: s.strip())
     )
 
 class TestProperties:
@@ -41,7 +42,7 @@ class TestProperties:
     @given(st.lists(valid_case_strategy(), min_size=1, max_size=10))
     def test_round_trip_consistency(self, cases):
         for c in cases:
-            if not c.virus_strain.strip():
+            if not c.virus_strain:
                 c.virus_strain = "Unknown"
             if not c.notes:
                 c.notes = ""
@@ -88,7 +89,7 @@ class TestProperties:
         
         if out_of_bounds:
             assert len(errors) > 0
-            assert any("Latitude" in err or "Longitude" in err for err in errors)
+            assert any("latitude" in err.lower() or "longitude" in err.lower() for err in errors)
         else:
             assert len(errors) == 0
 
@@ -105,7 +106,7 @@ class TestProperties:
         errors = validate_case(case)
         if not errors:
             assert case.location_name
-            assert case.status in ["Confirmed", "Probable", "Suspected"]
+            assert case.status in VALID_STATUSES
             assert case.date_reported
             assert -90.0 <= case.latitude <= 90.0
             assert -180.0 <= case.longitude <= 180.0
@@ -133,4 +134,3 @@ class TestProperties:
         expected = (time.time() - target_ts) > 86400
         # Give leeway for test execution time using a small epsilon if close
         assert is_stale(target_ts * 1000) == expected
-

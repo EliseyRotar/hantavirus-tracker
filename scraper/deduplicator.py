@@ -27,20 +27,41 @@ from scraper.models import Case
 # Internal helpers
 # ---------------------------------------------------------------------------
 
+_STATUS_WEIGHTS = {
+    "Confirmed": 50,
+    "Deceased": 40,
+    "Probable": 30,
+    "Suspected": 20,
+    "Monitoring": 10,
+    "Unknown": 0,
+}
+
+
 def _composite_key(case: Case) -> Tuple[str, str, str]:
     """Return the (location_name, date_reported, source) composite key."""
     return (case.location_name, case.date_reported, case.source)
 
 
-def _is_more_recent(candidate: Case, current: Case) -> bool:
-    """Return True if *candidate* has a more recent source_verified_at than *current*.
+def _should_replace(candidate: Case, current: Case) -> bool:
+    """Return True if *candidate* should replace *current*.
 
-    Comparison is done lexicographically on the ISO 8601 timestamp strings,
-    which is correct as long as timestamps are in a consistent format
-    (e.g. "2026-05-10T12:00:00Z").  An empty string is treated as the
-    oldest possible timestamp.
+    Replacement happens if:
+    1. *candidate* has a strictly more recent source_verified_at.
+    2. Timestamps are equal, but *candidate* has a more 'severe' status
+       (e.g., Confirmed > Suspected).
     """
-    return (candidate.source_verified_at or "") > (current.source_verified_at or "")
+    cand_ts = candidate.source_verified_at or ""
+    curr_ts = current.source_verified_at or ""
+
+    if cand_ts > curr_ts:
+        return True
+    if cand_ts < curr_ts:
+        return False
+
+    # Timestamps equal — tie-break on status severity
+    cand_weight = _STATUS_WEIGHTS.get(candidate.status, 0)
+    curr_weight = _STATUS_WEIGHTS.get(current.status, 0)
+    return cand_weight > curr_weight
 
 
 # ---------------------------------------------------------------------------
@@ -51,8 +72,9 @@ def deduplicate(cases: list[Case]) -> list[Case]:
     """Deduplicate *cases* by (location_name, date_reported, source).
 
     When two or more cases share the same composite key, the one with the
-    most recent ``source_verified_at`` timestamp is kept.  The relative
-    order of first-occurrence entries is preserved.
+    most recent ``source_verified_at`` timestamp (or more severe status
+    as a tie-breaker) is kept.  The relative order of first-occurrence
+    entries is preserved.
 
     Parameters
     ----------
@@ -75,9 +97,9 @@ def deduplicate(cases: list[Case]) -> list[Case]:
             seen[key] = len(result)
             result.append(case)
         else:
-            # Duplicate — keep the one with the more recent timestamp.
+            # Duplicate — decide which one to keep.
             idx = seen[key]
-            if _is_more_recent(case, result[idx]):
+            if _should_replace(case, result[idx]):
                 result[idx] = case
 
     return result

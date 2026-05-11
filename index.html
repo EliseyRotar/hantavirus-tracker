@@ -828,6 +828,11 @@
     </div>
     <div class="sheet-content" id="sheet-body" aria-hidden="true">
 
+      <section aria-labelledby="m-timeline-heading">
+        <div class="section-title" id="m-timeline-heading">Outbreak Timeline</div>
+        <div id="m-timeline-controls" class="filter-group"></div>
+      </section>
+
       <section aria-labelledby="m-filters-heading">
         <div class="section-title" id="m-filters-heading">Filters</div>
         <div id="m-filter-controls" class="filter-group"></div>
@@ -1004,8 +1009,8 @@
       2:  'Dutch female, ~69 yrs, wife of Case 1. Fell ill after Case 1; died Apr 26 in Johannesburg, South Africa.',
       3:  'British male. Admitted to ICU in South Africa. Confirmed Andes hantavirus.',
       4:  'German female. Fell ill aboard MV Hondius; died May 2 on the ship.',
-      5:  'Dutch male, ~41 yrs, ship's doctor. Confirmed case; treated in the Netherlands.',
-      6:  'British male, ~56 yrs, tour guide / crew member. Confirmed case; treated in the Netherlands.',
+      5:  "Dutch male, ~41 yrs, ship's doctor. Confirmed case; treated in the Netherlands.",
+      6:  "British male, ~56 yrs, tour guide / crew member. Confirmed case; treated in the Netherlands.",
       7:  'Swiss male. Confirmed case; treated in Zurich, Switzerland.',
       8:  'British male, Tristan da Cunha resident. Probable case; island contact during voyage stop.',
       9:  'French national. Tested positive May 11; in serious condition in Paris, France.',
@@ -1099,7 +1104,7 @@
 
     /* ── Mobile stats update ── */
     window.updateMobileStats = function(counts) {
-      var map = { confirmed: 'Confirmed', suspected: 'Suspected', deceased: 'Deceased', monitoring: 'Monitoring' };
+      var map = { confirmed: 'Confirmed', probable: 'Probable', suspected: 'Suspected', deceased: 'Deceased', monitoring: 'Monitoring' };
       Object.entries(map).forEach(function(e) {
         var el = document.getElementById('m-count-' + e[0]);
         if (el) el.textContent = (counts[e[1]] !== undefined) ? counts[e[1]] : '—';
@@ -1113,3 +1118,19 @@
 
 </body>
 </html>
+ts[e[1]] : '—';
+      });
+    };
+  </script>
+
+  <script src="js/ui.js"></script>
+  <script src="js/filters.js"></script>
+  <script src="js/map.js"></script>
+
+</body>
+</html>
+js"></script>
+
+</body>
+</html>
+>

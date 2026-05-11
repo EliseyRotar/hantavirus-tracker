@@ -27,14 +27,12 @@ from __future__ import annotations
 import hashlib
 from typing import Any
 
+from scraper.constants import VALID_STATUSES
 from scraper.models import Case
 
 # ---------------------------------------------------------------------------
 # Internal helpers
 # ---------------------------------------------------------------------------
-
-_VALID_STATUSES = frozenset({"Confirmed", "Probable", "Suspected"})
-
 
 def _make_case_id(source: str, location_name: str, date_reported: str) -> str:
     """Return a deterministic SHA-256 hex digest for the given triple."""
@@ -80,9 +78,9 @@ def _normalise_status(raw: Any) -> str:
     s = str(raw).strip()
     if not s:
         return "Suspected"
-    if s not in _VALID_STATUSES:
+    if s not in VALID_STATUSES:
         raise ValueError(
-            f"Field 'status' must be one of {sorted(_VALID_STATUSES)}; got {s!r}"
+            f"Field 'status' must be one of {sorted(VALID_STATUSES)}; got {s!r}"
         )
     return s
 

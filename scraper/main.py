@@ -14,10 +14,9 @@ Requirements: 1.5, 1.6, 3.5, 6.3, 7.1, 7.2, 7.6
 
 from __future__ import annotations
 
-import hashlib
+import concurrent.futures
 import json
 import logging
-import os
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
@@ -297,36 +296,42 @@ def main() -> None:
     existing_cases = _load_existing_cases()
 
     # ------------------------------------------------------------------
-    # 2. Run all source collectors
+    # 2. Run all source collectors in parallel
     # ------------------------------------------------------------------
     collectors = _load_collectors()
     all_new_cases: list = []
     source_timestamps: dict[str, str] = {}
     collector_stats: dict[str, dict] = {}
 
-    for source_name, collect_fn in collectors:
-        logger.info("--- Collecting from %s ---", source_name)
-        try:
-            cases, verified_at = collect_fn()
-            source_timestamps[source_name] = verified_at
-            collector_stats[source_name] = {
-                "status": "ok",
-                "cases_collected": len(cases),
-                "verified_at": verified_at,
-            }
-            all_new_cases.extend(cases)
-            logger.info(
-                "[%s] Collected %d cases (verified_at=%s)",
-                source_name,
-                len(cases),
-                verified_at,
-            )
-        except Exception as exc:
-            logger.error("[%s] Collector failed: %s", source_name, exc, exc_info=True)
-            collector_stats[source_name] = {
-                "status": "error",
-                "error": str(exc),
-            }
+    with concurrent.futures.ThreadPoolExecutor(max_workers=len(collectors)) as executor:
+        future_to_source = {
+            executor.submit(collect_fn): source_name 
+            for source_name, collect_fn in collectors
+        }
+        for future in concurrent.futures.as_completed(future_to_source):
+            source_name = future_to_source[future]
+            logger.info("--- Collecting from %s ---", source_name)
+            try:
+                cases, verified_at = future.result()
+                source_timestamps[source_name] = verified_at
+                collector_stats[source_name] = {
+                    "status": "ok",
+                    "cases_collected": len(cases),
+                    "verified_at": verified_at,
+                }
+                all_new_cases.extend(cases)
+                logger.info(
+                    "[%s] Collected %d cases (verified_at=%s)",
+                    source_name,
+                    len(cases),
+                    verified_at,
+                )
+            except Exception as exc:
+                logger.error("[%s] Collector failed: %s", source_name, exc, exc_info=True)
+                collector_stats[source_name] = {
+                    "status": "error",
+                    "error": str(exc),
+                }
 
     logger.info("Total raw cases collected: %d", len(all_new_cases))
 
@@ -387,7 +392,7 @@ def main() -> None:
     # 7. Write GeoJSON output
     # ------------------------------------------------------------------
     _GEOJSON_PATH.parent.mkdir(parents=True, exist_ok=True)
-    write_geojson(merged_cases, source_timestamps, str(_GEOJSON_PATH))
+    write_geojson(merged_cases, collector_stats, str(_GEOJSON_PATH))
     logger.info("Wrote %d cases to %s", len(merged_cases), _GEOJSON_PATH)
 
     # ------------------------------------------------------------------
