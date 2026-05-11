@@ -110,14 +110,14 @@ class TestEndToEndScraper:
         dt = datetime.fromisoformat(self.data["metadata"]["generated_at"])
         assert dt is not None
 
-    def test_metadata_has_source_timestamps(self):
-        assert "source_timestamps" in self.data["metadata"]
+    def test_metadata_has_source_stats(self):
+        assert "source_stats" in self.data["metadata"]
 
-    def test_source_timestamps_non_empty(self):
-        assert len(self.data["metadata"]["source_timestamps"]) > 0
+    def test_source_stats_non_empty(self):
+        assert len(self.data["metadata"]["source_stats"]) > 0
 
-    def test_all_five_sources_present_in_timestamps(self):
-        ts = self.data["metadata"]["source_timestamps"]
+    def test_all_five_sources_present_in_stats(self):
+        ts = self.data["metadata"]["source_stats"]
         for source in ("WHO", "ECDC", "CDC", "HealthMap", "GDELT"):
             assert source in ts, f"Missing source timestamp for {source}"
 

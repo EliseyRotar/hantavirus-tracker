@@ -48,7 +48,7 @@ class TestProperties:
                 c.notes = ""
             c.case_id = _make_case_id(c.source, c.location_name, c.date_reported)
             
-        fc = serialize_cases(cases, source_timestamps={})
+        fc = serialize_cases(cases, source_stats={})
         features = fc["features"]
         
         parsed_cases = []

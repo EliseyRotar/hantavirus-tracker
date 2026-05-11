@@ -5,7 +5,7 @@ Covers:
 - serialize_cases: structure of the returned FeatureCollection
 - serialize_cases: correct GeoJSON coordinate order [lon, lat]
 - serialize_cases: all Case fields present in feature properties
-- serialize_cases: metadata fields (generated_at, source_timestamps)
+- serialize_cases: metadata fields (generated_at, source_stats)
 - serialize_cases: empty case list produces valid FeatureCollection
 - write_geojson: file is written with 2-space indentation
 - write_geojson: written file is valid JSON that round-trips correctly
@@ -95,24 +95,24 @@ class TestSerializeCasesMetadata:
         dt = datetime.fromisoformat(generated_at)
         assert dt is not None
 
-    def test_metadata_has_source_timestamps(self):
+    def test_metadata_has_source_stats(self):
         result = serialize_cases([], SOURCE_TIMESTAMPS)
-        assert "source_timestamps" in result["metadata"]
+        assert "source_stats" in result["metadata"]
 
-    def test_source_timestamps_are_preserved(self):
+    def test_source_stats_are_preserved(self):
         result = serialize_cases([], SOURCE_TIMESTAMPS)
-        assert result["metadata"]["source_timestamps"] == SOURCE_TIMESTAMPS
+        assert result["metadata"]["source_stats"] == SOURCE_TIMESTAMPS
 
-    def test_empty_source_timestamps(self):
+    def test_empty_source_stats(self):
         result = serialize_cases([], {})
-        assert result["metadata"]["source_timestamps"] == {}
+        assert result["metadata"]["source_stats"] == {}
 
-    def test_source_timestamps_dict_is_a_copy(self):
+    def test_source_stats_dict_is_a_copy(self):
         """Mutating the original dict should not affect the serialized output."""
         ts = {"WHO": "2026-05-10T12:00:00Z"}
         result = serialize_cases([], ts)
         ts["NEW"] = "2026-01-01T00:00:00Z"
-        assert "NEW" not in result["metadata"]["source_timestamps"]
+        assert "NEW" not in result["metadata"]["source_stats"]
 
 
 # ---------------------------------------------------------------------------
@@ -321,10 +321,10 @@ class TestWriteGeojson:
                 data = json.load(fh)
             assert data["features"] == []
 
-    def test_source_timestamps_in_written_file(self):
+    def test_source_stats_in_written_file(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             path = os.path.join(tmpdir, "cases.geojson")
             write_geojson([], SOURCE_TIMESTAMPS, path)
             with open(path, encoding="utf-8") as fh:
                 data = json.load(fh)
-            assert data["metadata"]["source_timestamps"] == SOURCE_TIMESTAMPS
+            assert data["metadata"]["source_stats"] == SOURCE_TIMESTAMPS
