@@ -136,6 +136,9 @@
     return null; // truly unknown, skip
   }
 
+  /* ── Shared state ── */
+  window.mapState = { allFeatures: [], clusterGroup: null, map: null };
+
   /* ── Update visible-count badge ── */
   function updateVisibleCount(n) {
     var el = document.getElementById('visible-count');
