@@ -900,11 +900,17 @@
       <button id="case-panel-close" aria-label="Close case details" onclick="closeCasePanel()">✕</button>
     </div>
     <div id="case-panel-body">
+
+      <!-- Location + coordinates -->
       <div class="panel-field">
         <div class="panel-field-label">📍 Location</div>
         <div class="panel-field-value" id="cp-location-detail">—</div>
+        <div class="panel-field-value" id="cp-coords" style="font-size:11px;color:var(--muted);margin-top:2px;">—</div>
       </div>
+
       <div class="panel-divider"></div>
+
+      <!-- Onset date + Age/Sex -->
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
         <div class="panel-field">
           <div class="panel-field-label">📅 Onset Date</div>
@@ -915,19 +921,51 @@
           <div class="panel-field-value" id="cp-age-sex">—</div>
         </div>
       </div>
+
+      <!-- Exposure group -->
       <div class="panel-field">
         <div class="panel-field-label">🏷 Exposure Group</div>
         <div class="panel-field-value" id="cp-exposure">—</div>
       </div>
+
       <div class="panel-divider"></div>
+
+      <!-- Timeline context (known cases 1-10) -->
+      <div class="panel-field" id="cp-timeline-section" style="display:none;">
+        <div class="panel-field-label">🕐 Timeline Context</div>
+        <div class="panel-notes" id="cp-timeline" style="font-size:12px;line-height:1.65;color:#94a3b8;"></div>
+      </div>
+
+      <!-- Full details -->
       <div class="panel-field">
         <div class="panel-field-label">📋 Details</div>
         <div class="panel-notes" id="cp-notes">—</div>
       </div>
+
+      <div class="panel-divider"></div>
+
+      <!-- Source link -->
       <div class="panel-field">
         <div class="panel-field-label">🔗 Source</div>
         <div class="panel-field-value" id="cp-source">—</div>
       </div>
+
+      <!-- Official reference links -->
+      <div class="panel-field">
+        <div class="panel-field-label">📚 Official References</div>
+        <div style="display:flex;flex-direction:column;gap:5px;margin-top:4px;">
+          <a class="ext-link" style="padding:5px 7px;font-size:11px;"
+             href="https://www.who.int/emergencies/disease-outbreak-news/item/2026-DON599"
+             target="_blank" rel="noopener">🌐 WHO DON599 — Andes Hantavirus ↗</a>
+          <a class="ext-link" style="padding:5px 7px;font-size:11px;"
+             href="https://www.ecdc.europa.eu/en/infectious-disease-topics/hantavirus-infection/surveillance-and-updates/andes-hantavirus-outbreak"
+             target="_blank" rel="noopener">🇪🇺 ECDC — Andes Hantavirus Outbreak ↗</a>
+          <a class="ext-link" style="padding:5px 7px;font-size:11px;"
+             href="https://www.reddit.com/r/ContagionCuriosity/comments/1t5i3u3/hantavirus_outbreak_timeline/"
+             target="_blank" rel="noopener">📖 Reddit — Outbreak Timeline ↗</a>
+        </div>
+      </div>
+
     </div>
   </div>
 
@@ -959,6 +997,21 @@
     }
 
     /* ── Case panel ── */
+
+    /* Known case timeline facts (Cases 1–10) */
+    var CASE_TIMELINE = {
+      1:  'Dutch male, ~70 yrs, ornithologist. Index case. Fell ill aboard MV Hondius; died Apr 11 on the ship.',
+      2:  'Dutch female, ~69 yrs, wife of Case 1. Fell ill after Case 1; died Apr 26 in Johannesburg, South Africa.',
+      3:  'British male. Admitted to ICU in South Africa. Confirmed Andes hantavirus.',
+      4:  'German female. Fell ill aboard MV Hondius; died May 2 on the ship.',
+      5:  'Dutch male, ~41 yrs, ship's doctor. Confirmed case; treated in the Netherlands.',
+      6:  'British male, ~56 yrs, tour guide / crew member. Confirmed case; treated in the Netherlands.',
+      7:  'Swiss male. Confirmed case; treated in Zurich, Switzerland.',
+      8:  'British male, Tristan da Cunha resident. Probable case; island contact during voyage stop.',
+      9:  'French national. Tested positive May 11; in serious condition in Paris, France.',
+      10: 'American national. Tested positive May 10; reported asymptomatic in Nebraska, USA.'
+    };
+
     function openCasePanel(data) {
       var panel = document.getElementById('case-panel');
       if (!panel) return;
@@ -969,13 +1022,38 @@
         if (el) el.textContent = val || '—';
       };
 
-      setEl('cp-case-num',  'Case #' + (data.case_id || '—'));
-      setEl('cp-location',  data.location_name || '—');
+      /* Parse numeric case id */
+      var caseNum = parseInt(String(data.case_id || '').replace(/\D/g, ''), 10);
+
+      setEl('cp-case-num',        'Case #' + (data.case_id || '—'));
+      setEl('cp-location',        data.location_name || '—');
       setEl('cp-location-detail', data.location_name || '—');
-      setEl('cp-date',      data.date_formatted || '—');
-      setEl('cp-age-sex',   data.age_sex || '—');
-      setEl('cp-exposure',  data.exposure_group || '—');
-      setEl('cp-notes',     data.notes || 'No additional details.');
+      setEl('cp-date',            data.date_formatted || '—');
+      setEl('cp-age-sex',         data.age_sex || '—');
+      setEl('cp-exposure',        data.exposure_group || '—');
+      setEl('cp-notes',           data.notes || 'No additional details.');
+
+      /* Coordinates */
+      var coordsEl = document.getElementById('cp-coords');
+      if (coordsEl) {
+        if (data.lat && data.lon && data.lat !== '0.0000' && data.lon !== '0.0000') {
+          coordsEl.textContent = data.lat + ', ' + data.lon;
+        } else {
+          coordsEl.textContent = '';
+        }
+      }
+
+      /* Timeline context for known cases 1–10 */
+      var tlSection = document.getElementById('cp-timeline-section');
+      var tlEl      = document.getElementById('cp-timeline');
+      if (tlSection && tlEl) {
+        if (caseNum >= 1 && caseNum <= 10 && CASE_TIMELINE[caseNum]) {
+          tlEl.textContent = CASE_TIMELINE[caseNum];
+          tlSection.style.display = '';
+        } else {
+          tlSection.style.display = 'none';
+        }
+      }
 
       /* Status badge */
       var badge = document.getElementById('cp-status-badge');
@@ -984,9 +1062,9 @@
           confirmed:  { bg: 'rgba(239,68,68,0.15)',  border: 'rgba(239,68,68,0.4)',  text: '#ef4444' },
           suspected:  { bg: 'rgba(249,115,22,0.15)', border: 'rgba(249,115,22,0.4)', text: '#f97316' },
           deceased:   { bg: 'rgba(139,92,246,0.15)', border: 'rgba(139,92,246,0.4)', text: '#8b5cf6' },
-          monitoring: { bg: 'rgba(14,165,233,0.15)', border: 'rgba(14,165,233,0.4)', text: '#0ea5e9' },
+          monitoring: { bg: 'rgba(14,165,233,0.15)', border: 'rgba(14,165,233,0.4)', text: '#0ea5e9' }
         };
-        var key = (data.status || '').toLowerCase();
+        var key = (data.status || '').toLowerCase().split(' ')[0];
         var c = colors[key] || { bg: 'rgba(100,116,139,0.15)', border: 'rgba(100,116,139,0.4)', text: '#94a3b8' };
         badge.style.cssText = 'background:' + c.bg + ';border:1px solid ' + c.border + ';color:' + c.text + ';';
         badge.textContent = data.status || '—';
@@ -996,7 +1074,7 @@
       var srcEl = document.getElementById('cp-source');
       if (srcEl) {
         if (data.source && data.source.startsWith('http')) {
-          srcEl.innerHTML = '<a href="' + data.source.replace(/"/g,'&quot;') + '" target="_blank" rel="noopener">View source ↗</a>';
+          srcEl.innerHTML = '<a href="' + data.source.replace(/"/g, '&quot;') + '" target="_blank" rel="noopener">View source ↗</a>';
         } else {
           srcEl.textContent = data.source || '—';
         }
