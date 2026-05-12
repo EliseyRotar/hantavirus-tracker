@@ -1,37 +1,37 @@
 {
   "type": "FeatureCollection",
   "metadata": {
-    "generated_at": "2026-05-12T13:59:31.325747+00:00",
+    "generated_at": "2026-05-12T17:53:58.174139+00:00",
     "source_stats": {
       "ANDV_Dashboard": {
         "status": "ok",
         "cases_collected": 0,
-        "verified_at": "2026-05-12T13:58:54.139627+00:00"
+        "verified_at": "2026-05-12T17:53:31.538956+00:00"
       },
       "CDC": {
         "status": "ok",
         "cases_collected": 6,
-        "verified_at": "2026-05-12T13:58:54.141210+00:00"
+        "verified_at": "2026-05-12T17:53:31.540080+00:00"
       },
       "WHO": {
         "status": "ok",
         "cases_collected": 20,
-        "verified_at": "2026-05-12T13:58:54.140022+00:00"
+        "verified_at": "2026-05-12T17:53:31.539315+00:00"
       },
       "ECDC": {
         "status": "ok",
         "cases_collected": 7,
-        "verified_at": "2026-05-12T13:58:54.140388+00:00"
+        "verified_at": "2026-05-12T17:53:31.539629+00:00"
       },
       "HealthMap": {
         "status": "ok",
         "cases_collected": 5,
-        "verified_at": "2026-05-12T13:58:54.141403+00:00"
+        "verified_at": "2026-05-12T17:53:31.540558+00:00"
       },
       "GDELT": {
         "status": "ok",
         "cases_collected": 5,
-        "verified_at": "2026-05-12T13:58:54.142740+00:00"
+        "verified_at": "2026-05-12T17:53:31.541605+00:00"
       }
     }
   },
@@ -98,7 +98,7 @@
         "longitude": -25.0,
         "location_name": "MV Hondius (Atlantic Ocean)",
         "virus_strain": "Andes",
-        "source_verified_at": "2026-05-12T13:58:54.140022+00:00",
+        "source_verified_at": "2026-05-12T17:53:31.539315+00:00",
         "notes": "Third confirmed death occurred on board. Cluster of 6 confirmed + 2 probable Andes virus cases. WHO notified 2 May. WHO DON 2026-DON600."
       }
     },
@@ -648,7 +648,7 @@
         "longitude": -68.3,
         "location_name": "Ushuaia, Argentina",
         "virus_strain": "Andes",
-        "source_verified_at": "2026-05-12T13:58:54.140022+00:00",
+        "source_verified_at": "2026-05-12T17:53:31.539315+00:00",
         "notes": "⚠ Andes virus (South American source — person-to-person transmission possible). MV Hondius voyage departure 1 Apr 2026. Andes virus exposure likely during shore excursion in Patagonia. First symptom onset 6 Apr. WHO DON 2026-DON600."
       }
     },
@@ -670,7 +670,7 @@
         "longitude": -5.7,
         "location_name": "Saint Helena",
         "virus_strain": "Andes",
-        "source_verified_at": "2026-05-12T13:58:54.140022+00:00",
+        "source_verified_at": "2026-05-12T17:53:31.539315+00:00",
         "notes": "First ANDV death: Dutch passenger medically evacuated and died. Wife disembarked and later died in Johannesburg. WHO DON 2026-DON600."
       }
     },
@@ -692,7 +692,7 @@
         "longitude": 28.0,
         "location_name": "Johannesburg, South Africa",
         "virus_strain": "Andes",
-        "source_verified_at": "2026-05-12T13:58:54.140022+00:00",
+        "source_verified_at": "2026-05-12T17:53:31.539315+00:00",
         "notes": "South Africa NICD lab-confirmed 2 cases, including 1 death (wife of first victim). British passenger also hospitalised here in critical condition. WHO DON 2026-DON600."
       }
     },
@@ -736,7 +736,7 @@
         "longitude": -23.5,
         "location_name": "Praia, Cabo Verde",
         "virus_strain": "Andes",
-        "source_verified_at": "2026-05-12T13:58:54.140022+00:00",
+        "source_verified_at": "2026-05-12T17:53:31.539315+00:00",
         "notes": "MV Hondius docked at Praia 3 days; no passengers disembarked. Contact tracing for local port workers. WHO DON 2026-DON600."
       }
     },
@@ -758,7 +758,7 @@
         "longitude": -16.5,
         "location_name": "Tenerife, Canary Islands, Spain",
         "virus_strain": "Andes",
-        "source_verified_at": "2026-05-12T13:58:54.140022+00:00",
+        "source_verified_at": "2026-05-12T17:53:31.539315+00:00",
         "notes": "MV Hondius arrived Granadilla de Abona, Tenerife 10 May 2026. All passengers disembarked for repatriation flights to 23 countries. Spanish authorities managing screening. WHO DON 2026-DON600."
       }
     },
@@ -780,7 +780,7 @@
         "longitude": 5.3,
         "location_name": "Netherlands",
         "virus_strain": "Andes",
-        "source_verified_at": "2026-05-12T13:58:54.140022+00:00",
+        "source_verified_at": "2026-05-12T17:53:31.539315+00:00",
         "notes": "3 lab-confirmed Andes virus cases: 1 confirmed death on board (2 May, ship flag state) + 2 confirmed survivors medically evacuated. WHO DON 2026-DON600."
       }
     },
@@ -802,7 +802,7 @@
         "longitude": 8.5,
         "location_name": "Zurich, Switzerland",
         "virus_strain": "Andes",
-        "source_verified_at": "2026-05-12T13:58:54.140022+00:00",
+        "source_verified_at": "2026-05-12T17:53:31.539315+00:00",
         "notes": "1 lab-confirmed Andes virus case post-disembarkation. WHO DON 2026-DON600."
       }
     },
@@ -824,7 +824,7 @@
         "longitude": 10.5,
         "location_name": "Germany",
         "virus_strain": "Andes",
-        "source_verified_at": "2026-05-12T13:58:54.140022+00:00",
+        "source_verified_at": "2026-05-12T17:53:31.539315+00:00",
         "notes": "German nationals repatriated from MV Hondius under monitoring. WHO DON 2026-DON600."
       }
     },
@@ -846,7 +846,7 @@
         "longitude": -15.4,
         "location_name": "MV Hondius vessel (Atlantic Ocean)",
         "virus_strain": "Andes",
-        "source_verified_at": "2026-05-12T13:58:54.140388+00:00",
+        "source_verified_at": "2026-05-12T17:53:31.539629+00:00",
         "notes": "ECDC notified 2 May 2026 via EU EWRS. Cluster of 6 confirmed + 2 probable Andes hantavirus cases on Dutch-flagged cruise ship. 23 nationalities on board including 9 EU/EEA countries. ECDC rapid risk assessment, 10 May 2026."
       }
     },
@@ -868,7 +868,7 @@
         "longitude": 5.3,
         "location_name": "Netherlands",
         "virus_strain": "Andes",
-        "source_verified_at": "2026-05-12T13:58:54.140388+00:00",
+        "source_verified_at": "2026-05-12T17:53:31.539629+00:00",
         "notes": "Dutch passengers among confirmed fatalities. Netherlands notified ECDC via EU EWRS on 2 May 2026. ECDC rapid risk assessment."
       }
     },
@@ -890,7 +890,7 @@
         "longitude": 10.5,
         "location_name": "Germany",
         "virus_strain": "Andes",
-        "source_verified_at": "2026-05-12T13:58:54.140388+00:00",
+        "source_verified_at": "2026-05-12T17:53:31.539629+00:00",
         "notes": "German national confirmed fatality linked to MV Hondius cluster. ECDC rapid risk assessment, 10 May 2026."
       }
     },
@@ -912,7 +912,7 @@
         "longitude": -15.4,
         "location_name": "Tenerife, Canary Islands, Spain",
         "virus_strain": "Andes",
-        "source_verified_at": "2026-05-12T13:58:54.140388+00:00",
+        "source_verified_at": "2026-05-12T17:53:31.539629+00:00",
         "notes": "MV Hondius arrived Grandilla de Abona, Tenerife. Passengers disembarking onto repatriation flights to 6 European countries and Canada. ECDC rapid risk assessment, 10 May 2026."
       }
     },
@@ -934,7 +934,7 @@
         "longitude": 8.5,
         "location_name": "Zurich, Switzerland",
         "virus_strain": "Andes",
-        "source_verified_at": "2026-05-12T13:58:54.140388+00:00",
+        "source_verified_at": "2026-05-12T17:53:31.539629+00:00",
         "notes": "Hospitalised case repatriated to Switzerland. ECDC rapid risk assessment, 10 May 2026."
       }
     },
@@ -956,7 +956,7 @@
         "longitude": -5.7,
         "location_name": "Saint Helena",
         "virus_strain": "Andes",
-        "source_verified_at": "2026-05-12T13:58:54.140388+00:00",
+        "source_verified_at": "2026-05-12T17:53:31.539629+00:00",
         "notes": "30 passengers disembarked at Saint Helena; all contact-traced by UK Health Security Agency. ECDC rapid risk assessment, 10 May 2026."
       }
     },
@@ -978,7 +978,7 @@
         "longitude": 28.0,
         "location_name": "Johannesburg, South Africa",
         "virus_strain": "Andes",
-        "source_verified_at": "2026-05-12T13:58:54.140388+00:00",
+        "source_verified_at": "2026-05-12T17:53:31.539629+00:00",
         "notes": "British passenger hospitalised in critical but stable condition. Second fatality (Dutch woman) also died here. ECDC rapid risk assessment, 10 May 2026."
       }
     },
@@ -1000,7 +1000,7 @@
         "longitude": -68.3,
         "location_name": "Ushuaia, Argentina",
         "virus_strain": "Andes",
-        "source_verified_at": "2026-05-12T13:58:54.141210+00:00",
+        "source_verified_at": "2026-05-12T17:53:31.540080+00:00",
         "notes": "⚠ Andes virus (South American source — person-to-person transmission possible). MV Hondius departed Ushuaia 1 April 2026. Andes virus exposure likely during shore excursion in Patagonia. CDC HAN-00528."
       }
     },
@@ -1022,7 +1022,7 @@
         "longitude": -5.7,
         "location_name": "Saint Helena",
         "virus_strain": "Andes",
-        "source_verified_at": "2026-05-12T13:58:54.141210+00:00",
+        "source_verified_at": "2026-05-12T17:53:31.540080+00:00",
         "notes": "First fatality removed from MV Hondius at Saint Helena. 30 passengers disembarked; contact tracing underway. CDC HAN-00528."
       }
     },
@@ -1044,7 +1044,7 @@
         "longitude": 28.0,
         "location_name": "Johannesburg, South Africa",
         "virus_strain": "Andes",
-        "source_verified_at": "2026-05-12T13:58:54.141210+00:00",
+        "source_verified_at": "2026-05-12T17:53:31.540080+00:00",
         "notes": "Second fatality (wife of first victim) died in Johannesburg. British passenger hospitalised in critical but stable condition. CDC HAN-00528."
       }
     },
@@ -1066,7 +1066,7 @@
         "longitude": -15.4,
         "location_name": "Tenerife, Canary Islands, Spain",
         "virus_strain": "Andes",
-        "source_verified_at": "2026-05-12T13:58:54.141210+00:00",
+        "source_verified_at": "2026-05-12T17:53:31.540080+00:00",
         "notes": "CDC sent team to Canary Islands 7 May 2026. MV Hondius arrived Tenerife 10 May. 17 Americans repatriated to Nebraska facility. CDC classified as Level 3 emergency response. CDC HAN-00528."
       }
     },
@@ -1088,7 +1088,7 @@
         "longitude": -99.9,
         "location_name": "Nebraska, United States",
         "virus_strain": "Andes",
-        "source_verified_at": "2026-05-12T13:58:54.141210+00:00",
+        "source_verified_at": "2026-05-12T17:53:31.540080+00:00",
         "notes": "17 American passengers repatriated to Nebraska facility with specialised medical capabilities for monitoring. CDC HAN-00528."
       }
     },
@@ -1110,7 +1110,7 @@
         "longitude": -23.5,
         "location_name": "Praia, Cabo Verde",
         "virus_strain": "Andes",
-        "source_verified_at": "2026-05-12T13:58:54.141210+00:00",
+        "source_verified_at": "2026-05-12T17:53:31.540080+00:00",
         "notes": "MV Hondius docked at Praia, Cabo Verde. No passengers disembarked as local facilities unable to handle safe evacuation. CDC HAN-00528."
       }
     },
@@ -1132,7 +1132,7 @@
         "longitude": 18.4,
         "location_name": "Cape Town, South Africa",
         "virus_strain": "Andes",
-        "source_verified_at": "2026-05-12T13:58:54.141403+00:00",
+        "source_verified_at": "2026-05-12T17:53:31.540558+00:00",
         "notes": "HealthMap alert: Suspected hantavirus outbreak on cruise ship reported near South Africa. Three dead, several ill. MV Hondius voyage."
       }
     },
@@ -1154,7 +1154,7 @@
         "longitude": -23.5,
         "location_name": "Praia, Cabo Verde",
         "virus_strain": "Andes",
-        "source_verified_at": "2026-05-12T13:58:54.141403+00:00",
+        "source_verified_at": "2026-05-12T17:53:31.540558+00:00",
         "notes": "HealthMap alert: MV Hondius docked at Praia, Cabo Verde. Hantavirus outbreak on board; no disembarkation. MV Hondius voyage."
       }
     },
@@ -1176,7 +1176,7 @@
         "longitude": -15.4,
         "location_name": "Tenerife, Canary Islands, Spain",
         "virus_strain": "Andes",
-        "source_verified_at": "2026-05-12T13:58:54.141403+00:00",
+        "source_verified_at": "2026-05-12T17:53:31.540558+00:00",
         "notes": "HealthMap alert: MV Hondius arrived Tenerife. Andes virus confirmed. Evacuation flights underway. MV Hondius voyage."
       }
     },
@@ -1198,7 +1198,7 @@
         "longitude": 5.3,
         "location_name": "Netherlands",
         "virus_strain": "Andes",
-        "source_verified_at": "2026-05-12T13:58:54.141403+00:00",
+        "source_verified_at": "2026-05-12T17:53:31.540558+00:00",
         "notes": "HealthMap alert: Dutch passengers confirmed with Andes hantavirus. Two fatalities. MV Hondius voyage."
       }
     },
@@ -1220,7 +1220,7 @@
         "longitude": -68.3,
         "location_name": "Ushuaia, Argentina",
         "virus_strain": "Andes",
-        "source_verified_at": "2026-05-12T13:58:54.141403+00:00",
+        "source_verified_at": "2026-05-12T17:53:31.540558+00:00",
         "notes": "⚠ Andes virus (South American source — person-to-person transmission possible). HealthMap alert: MV Hondius departed Ushuaia. Andes virus exposure likely during Patagonia shore excursion. MV Hondius voyage."
       }
     },
@@ -1242,7 +1242,7 @@
         "longitude": -68.3,
         "location_name": "Ushuaia, Argentina",
         "virus_strain": "Andes",
-        "source_verified_at": "2026-05-12T13:58:54.142740+00:00",
+        "source_verified_at": "2026-05-12T17:53:31.541605+00:00",
         "notes": "⚠ Andes virus (South American source — person-to-person transmission possible). GDELT news signal: MV Hondius departed Ushuaia with Andes virus exposure. Multiple international news sources. MV Hondius voyage."
       }
     },
@@ -1264,7 +1264,7 @@
         "longitude": 18.4,
         "location_name": "Cape Town, South Africa",
         "virus_strain": "Andes",
-        "source_verified_at": "2026-05-12T13:58:54.142740+00:00",
+        "source_verified_at": "2026-05-12T17:53:31.541605+00:00",
         "notes": "GDELT news signal: Hantavirus outbreak on cruise ship reported near South Africa. MV Hondius voyage."
       }
     },
@@ -1286,7 +1286,7 @@
         "longitude": -23.5,
         "location_name": "Praia, Cabo Verde",
         "virus_strain": "Andes",
-        "source_verified_at": "2026-05-12T13:58:54.142740+00:00",
+        "source_verified_at": "2026-05-12T17:53:31.541605+00:00",
         "notes": "GDELT news signal: MV Hondius docked at Cabo Verde with hantavirus outbreak on board. MV Hondius voyage."
       }
     },
@@ -1308,7 +1308,7 @@
         "longitude": -15.4,
         "location_name": "Tenerife, Canary Islands, Spain",
         "virus_strain": "Andes",
-        "source_verified_at": "2026-05-12T13:58:54.142740+00:00",
+        "source_verified_at": "2026-05-12T17:53:31.541605+00:00",
         "notes": "GDELT news signal: MV Hondius arrived Tenerife; Andes virus confirmed; evacuation flights. MV Hondius voyage."
       }
     },
@@ -1330,7 +1330,7 @@
         "longitude": 5.3,
         "location_name": "Netherlands",
         "virus_strain": "Andes",
-        "source_verified_at": "2026-05-12T13:58:54.142740+00:00",
+        "source_verified_at": "2026-05-12T17:53:31.541605+00:00",
         "notes": "GDELT news signal: Dutch passengers confirmed with Andes hantavirus; two fatalities. MV Hondius voyage."
       }
     },
@@ -1352,7 +1352,7 @@
         "longitude": -59.0,
         "location_name": "Falkland Islands",
         "virus_strain": "Andes",
-        "source_verified_at": "2026-05-12T13:59:31.325280+00:00",
+        "source_verified_at": "2026-05-12T17:53:58.173669+00:00",
         "notes": "MV Hondius voyage — stop at Falkland Islands."
       }
     },
@@ -1374,7 +1374,7 @@
         "longitude": -36.5,
         "location_name": "South Georgia",
         "virus_strain": "Andes",
-        "source_verified_at": "2026-05-12T13:59:31.325280+00:00",
+        "source_verified_at": "2026-05-12T17:53:58.173669+00:00",
         "notes": "MV Hondius voyage — stop at South Georgia."
       }
     },
@@ -1594,7 +1594,7 @@
         "longitude": 2.2,
         "location_name": "France",
         "virus_strain": "Andes",
-        "source_verified_at": "2026-05-12T13:58:54.140022+00:00",
+        "source_verified_at": "2026-05-12T17:53:31.539315+00:00",
         "notes": "French Health Minister Rist confirmed French evacuee tested positive for Andes virus on 11 May 2026. WHO DON 2026-DON600 / Reuters 11 May."
       }
     },
@@ -1616,7 +1616,7 @@
         "longitude": -95.9,
         "location_name": "Omaha, Nebraska, USA",
         "virus_strain": "Andes",
-        "source_verified_at": "2026-05-12T13:58:54.140022+00:00",
+        "source_verified_at": "2026-05-12T17:53:31.539315+00:00",
         "notes": "American evacuee at Nebraska Medicine National Quarantine Unit tested mildly positive for Andes virus (HHS/CDC 11 May). WHO classifies as Suspected pending formal confirmation. WHO DON 2026-DON600."
       }
     },
@@ -1638,7 +1638,7 @@
         "longitude": -12.3,
         "location_name": "Tristan da Cunha",
         "virus_strain": "Andes",
-        "source_verified_at": "2026-05-12T13:58:54.140022+00:00",
+        "source_verified_at": "2026-05-12T17:53:31.539315+00:00",
         "notes": "UK Health Security Agency reported a suspected British case on Tristan da Cunha. UKHSA monitoring. WHO DON 2026-DON600."
       }
     },
@@ -1660,7 +1660,7 @@
         "longitude": 12.5,
         "location_name": "Italy",
         "virus_strain": "Andes",
-        "source_verified_at": "2026-05-12T13:58:54.140022+00:00",
+        "source_verified_at": "2026-05-12T17:53:31.539315+00:00",
         "notes": "4 individuals under active surveillance: passengers who shared a connecting flight via Rome Fiumicino with a later-deceased MV Hondius passenger. Located in Calabria, Campania, Tuscany and Veneto. No confirmed infection as of 11 May. Italian Ministry of Health circular issued. Risk assessed as very low (ECDC)."
       }
     },
@@ -1682,7 +1682,7 @@
         "longitude": -3.7,
         "location_name": "Spain (flight contacts)",
         "virus_strain": "Andes",
-        "source_verified_at": "2026-05-12T13:58:54.140022+00:00",
+        "source_verified_at": "2026-05-12T17:53:31.539315+00:00",
         "notes": "2 women in Alicante and Catalonia on same KLM flight as Hondius passenger who later died in Johannesburg — both PCR negative (Spain Min. Health, 9 May). Remain under monitoring. Also: Tenerife disembarkation site for full ship. WHO DON 2026-DON600."
       }
     },
@@ -1704,7 +1704,7 @@
         "longitude": -106.3,
         "location_name": "Canada",
         "virus_strain": "Andes",
-        "source_verified_at": "2026-05-12T13:58:54.140022+00:00",
+        "source_verified_at": "2026-05-12T17:53:31.539315+00:00",
         "notes": "Public Health Agency Canada: 3 Canadians self-isolating in Ontario/Quebec; 4 Canadians on board without symptoms as of 8 May. WHO DON 2026-DON600."
       }
     },
@@ -1726,7 +1726,7 @@
         "longitude": -0.1,
         "location_name": "United Kingdom",
         "virus_strain": "Andes",
-        "source_verified_at": "2026-05-12T13:58:54.140022+00:00",
+        "source_verified_at": "2026-05-12T17:53:31.539315+00:00",
         "notes": "UKHSA contact tracing for UK nationals repatriated from MV Hondius. Separate from suspected Tristan da Cunha case. WHO DON 2026-DON600."
       }
     },
@@ -1748,7 +1748,7 @@
         "longitude": 103.82,
         "location_name": "Singapore",
         "virus_strain": "Andes",
-        "source_verified_at": "2026-05-12T13:58:54.140022+00:00",
+        "source_verified_at": "2026-05-12T17:53:31.539315+00:00",
         "notes": "Singapore CDA: both residents under monitoring tested negative (8 May) but remain in quarantine as contacts. WHO DON 2026-DON600."
       }
     },
@@ -1770,7 +1770,7 @@
         "longitude": -58.4,
         "location_name": "Buenos Aires, Argentina",
         "virus_strain": "Andes",
-        "source_verified_at": "2026-05-12T13:58:54.140022+00:00",
+        "source_verified_at": "2026-05-12T17:53:31.539315+00:00",
         "notes": "⚠ Andes virus (South American source — person-to-person transmission possible). Argentine authorities conducting contact tracing for nationals on MV Hondius. Andes reservoir (long-tailed pygmy rice rat) endemic in Patagonia. WHO DON 2026-DON600."
       }
     },
@@ -1792,7 +1792,7 @@
         "longitude": -70.6,
         "location_name": "Chile",
         "virus_strain": "Andes",
-        "source_verified_at": "2026-05-12T13:58:54.140022+00:00",
+        "source_verified_at": "2026-05-12T17:53:31.539315+00:00",
         "notes": "⚠ Andes virus (South American source — person-to-person transmission possible). Chilean health authorities conducting contact tracing for MV Hondius nationals. WHO DON 2026-DON600."
       }
     },
@@ -1814,7 +1814,7 @@
         "longitude": -14.4,
         "location_name": "Ascension Island",
         "virus_strain": "Andes",
-        "source_verified_at": "2026-05-12T13:58:54.140022+00:00",
+        "source_verified_at": "2026-05-12T17:53:31.539315+00:00",
         "notes": "MV Hondius itinerary waypoint. WHO DON 2026-DON600."
       }
     }
