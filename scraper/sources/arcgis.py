@@ -7,9 +7,7 @@ Dashboard: https://www.arcgis.com/apps/dashboards/5c68442d2afc42d7ba2696e4cd3937
 from __future__ import annotations
 import hashlib
 import logging
-import math
 from datetime import datetime, timezone
-from typing import Optional
 
 from scraper.http_client import fetch_json
 from scraper.models import Case
@@ -116,7 +114,7 @@ def collect() -> tuple[list[Case], str]:
 
             # Fix location name for UNKNOWN cases
             if not location or location.upper() in ("UNKNOWN", "NONE"):
-                for key in LOCATION_COORDS:
+                for key in _LOCATION_COORDS:
                     if key in details.upper():
                         location = key.title()
                         break
