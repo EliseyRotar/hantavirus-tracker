@@ -360,11 +360,14 @@ def main() -> None:
     )
 
     # ------------------------------------------------------------------
-    # 4. Add MV Hondius itinerary seed cases (Task 5.8)
+    # 4. Add MV Hondius itinerary waypoints — clearly labeled as voyage
+    #    route data, NOT confirmed outbreak cases. Only added if ArcGIS
+    #    has no data for those locations.
     # ------------------------------------------------------------------
     existing_location_names = {c.location_name for c in valid_cases}
-    hondius_seed_verified_at = datetime.now(tz=timezone.utc).isoformat()
-    source_timestamps["MV_Hondius_Seed"] = hondius_seed_verified_at
+    # Use a fixed timestamp (voyage date) not run time, to avoid fabricating freshness
+    hondius_seed_verified_at = "2026-05-10T00:00:00+00:00"  # ship arrival date
+    source_timestamps["MV_Hondius_Route"] = hondius_seed_verified_at
 
     hondius_cases = _build_hondius_seed_cases(
         existing_location_names, hondius_seed_verified_at
@@ -377,16 +380,27 @@ def main() -> None:
     valid_cases = _flag_andes_cases(valid_cases)
 
     # ------------------------------------------------------------------
-    # 6. Merge with existing data and deduplicate
+    # 6. Use ArcGIS as authoritative source — don't merge stale rows forever.
+    #    If ArcGIS returned data, it IS the current state; only supplement
+    #    with seed data for locations not covered by ArcGIS.
     # ------------------------------------------------------------------
-    merged_cases = merge_with_existing(valid_cases, existing_cases)
-    logger.info(
-        "After merge+dedup: %d total cases (%d existing + %d new → %d merged)",
-        len(merged_cases),
-        len(existing_cases),
-        len(valid_cases),
-        len(merged_cases),
-    )
+    arcgis_cases = [c for c in valid_cases if c.source == "ANDV_Dashboard"]
+    supplementary_cases = [c for c in valid_cases if c.source != "ANDV_Dashboard"]
+
+    if arcgis_cases:
+        # ArcGIS is authoritative — start fresh from its data, add supplementary
+        # only for locations not already in ArcGIS
+        arcgis_locations = {c.location_name for c in arcgis_cases}
+        extra = [c for c in supplementary_cases if c.location_name not in arcgis_locations]
+        merged_cases = arcgis_cases + extra
+        logger.info(
+            "ArcGIS authoritative: %d cases + %d supplementary non-overlapping = %d total",
+            len(arcgis_cases), len(extra), len(merged_cases)
+        )
+    else:
+        # ArcGIS unavailable — fall back to merge with existing
+        logger.warning("ArcGIS returned no cases — falling back to merge with existing snapshot")
+        merged_cases = merge_with_existing(valid_cases, existing_cases)
 
     # ------------------------------------------------------------------
     # 7. Write GeoJSON output

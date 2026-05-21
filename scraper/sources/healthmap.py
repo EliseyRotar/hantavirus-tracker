@@ -28,10 +28,10 @@ logger = logging.getLogger(__name__)
 
 SOURCE = "HealthMap"
 
-# HealthMap JSON alert feed — disease_id 38 = hantavirus
-_HEALTHMAP_FEED_URL = (
-    "https://healthmap.org/getAlerts.php?disease_id=38&striphtml=1&json=1"
-)
+# HealthMap does not expose a public documented API.
+# The getAlerts.php endpoint is undocumented and not authorized for scraping.
+# This collector only uses hardcoded seed data from known public alerts.
+_HEALTHMAP_FEED_URL = None  # disabled — no public API available
 
 # ---------------------------------------------------------------------------
 # Seed data — HealthMap-style alerts for the May 2026 MV Hondius outbreak
@@ -123,68 +123,8 @@ def _parse_seed_cases(source_verified_at: str) -> list[Case]:
 
 
 def _try_fetch_live(source_verified_at: str) -> Optional[list[Case]]:
-    """
-    Attempt to fetch live HealthMap alerts for hantavirus.
-
-    Returns a list of Cases if the feed is available and parseable,
-    or None to signal fallback to seed data.
-    """
-    try:
-        data = fetch_json(_HEALTHMAP_FEED_URL, SOURCE)
-
-        if not isinstance(data, list) or len(data) == 0:
-            logger.info("[%s] HealthMap feed returned empty or non-list response.", SOURCE)
-            return None
-
-        cases: list[Case] = []
-        hanta_re = re.compile(r"hantavirus|andes\s+virus", re.IGNORECASE)
-
-        for alert in data:
-            if not isinstance(alert, dict):
-                continue
-            # HealthMap alert fields: place_name, country, lat, lng, summary,
-            # link, disease, date
-            summary = str(alert.get("summary", "") or "")
-            disease = str(alert.get("disease", "") or "")
-            if not (hanta_re.search(summary) or hanta_re.search(disease)):
-                continue
-
-            try:
-                case = parse_json(
-                    {
-                        "location_name": (
-                            alert.get("place_name")
-                            or alert.get("country")
-                            or "Unknown"
-                        ),
-                        "status": "Suspected",
-                        "date_reported": (
-                            alert.get("date", "")[:10]
-                            if alert.get("date")
-                            else datetime.now(tz=timezone.utc).date().isoformat()
-                        ),
-                        "latitude": alert.get("lat", 0.0),
-                        "longitude": alert.get("lng", 0.0),
-                        "virus_strain": "Andes" if "andes" in disease.lower() else "Unknown",
-                        "notes": summary[:500],
-                    },
-                    SOURCE,
-                    source_verified_at,
-                )
-                cases.append(case)
-            except (ValueError, TypeError) as exc:
-                logger.debug("[%s] Skipping alert: %s", SOURCE, exc)
-
-        if cases:
-            logger.info("[%s] Fetched %d live alerts.", SOURCE, len(cases))
-            return cases
-
-        logger.info("[%s] No hantavirus alerts in live feed; using seed data.", SOURCE)
-        return None
-
-    except Exception as exc:
-        logger.warning("[%s] Live feed fetch failed: %s", SOURCE, exc)
-        return None
+    """HealthMap has no public documented API — always use seed data."""
+    return None
 
 
 def collect() -> tuple[list[Case], str]:

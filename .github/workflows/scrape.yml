@@ -34,6 +34,7 @@ jobs:
         with:
           name: scrape-log
           path: scraper/scrape.log
+          retention-days: 7
 
       - name: Commit and push updated GeoJSON
         run: |
