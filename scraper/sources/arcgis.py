@@ -61,9 +61,21 @@ def _resolve_coords(location: str, details: str, lon: float, lat: float):
     if lon and lat and -180 <= lon <= 180 and -90 <= lat <= 90 and (lon != 0 or lat != 0):
         return lat, lon
     loc = (location or "").upper().strip()
+    # Strip common prefixes that cause mismatches
+    for prefix in ("THE ", "CITY OF ", "PROVINCE OF "):
+        if loc.startswith(prefix):
+            loc = loc[len(prefix):]
     det = (details or "").upper()
+    # Exact match first
+    if loc and loc in _LOCATION_COORDS:
+        return _LOCATION_COORDS[loc]
+    # Substring match: location contains key or key contains location
     for key, coords in _LOCATION_COORDS.items():
-        if key in loc or key in det:
+        if loc and (key in loc or loc in key):
+            return coords
+    # Scan details text
+    for key, coords in _LOCATION_COORDS.items():
+        if key in det:
             return coords
     return None
 
@@ -121,7 +133,10 @@ def collect() -> tuple[list[Case], str]:
                 else:
                     location = "Unknown location"
 
-            date_reported = _epoch_to_iso(props.get("ONSET")) or _now_utc()[:10]
+            # Use actual onset date if available; otherwise use a sentinel
+            # that makes clear the date is unknown — never fabricate today's date
+            onset_raw = props.get("ONSET")
+            date_reported = _epoch_to_iso(onset_raw) if onset_raw else "unknown"
             sex_code = props.get("SEX")
             sex = "♂" if sex_code == 1 else "♀" if sex_code == 2 else ""
             age = props.get("AGE")
@@ -151,5 +166,5 @@ def collect() -> tuple[list[Case], str]:
         return cases, source_verified_at
 
     except Exception as exc:
-        logger.error("[%s] Failed: %s", SOURCE, exc)
+        logger.error("[%s] Failed to fetch from ArcGIS: %s — stale snapshot will be used as fallback", SOURCE, exc)
         return [], source_verified_at

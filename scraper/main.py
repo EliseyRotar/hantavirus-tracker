@@ -399,7 +399,10 @@ def main() -> None:
         )
     else:
         # ArcGIS unavailable — fall back to merge with existing
-        logger.warning("ArcGIS returned no cases — falling back to merge with existing snapshot")
+        logger.warning(
+            "ArcGIS returned no cases — falling back to merge with existing snapshot. "
+            "Published data may be stale. Check scrape.log for ArcGIS error details."
+        )
         merged_cases = merge_with_existing(valid_cases, existing_cases)
 
     # ------------------------------------------------------------------
