@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <meta name="theme-color" content="#080c14" />
+  <meta name="theme-color" content="#0d1117" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <title>Hantavirus Tracker — Live Global Surveillance Map 2026</title>
@@ -12,8 +12,6 @@
   <meta name="author" content="EliseyRotar" />
   <meta name="robots" content="index, follow" />
   <link rel="canonical" href="https://eliseyrotar.github.io/hantavirus-tracker/" />
-
-  <!-- Open Graph (Facebook, LinkedIn, WhatsApp) -->
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://eliseyrotar.github.io/hantavirus-tracker/" />
   <meta property="og:title" content="Hantavirus Tracker — Live Global Surveillance Map 2026" />
@@ -21,15 +19,11 @@
   <meta property="og:image" content="https://eliseyrotar.github.io/hantavirus-tracker/og-image.png" />
   <meta property="og:site_name" content="Hantavirus Tracker" />
   <meta property="og:locale" content="en_US" />
-
-  <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:url" content="https://eliseyrotar.github.io/hantavirus-tracker/" />
   <meta name="twitter:title" content="Hantavirus Tracker — Live Global Surveillance Map 2026" />
   <meta name="twitter:description" content="Live interactive map tracking the 2026 Andes hantavirus outbreak on the MV Hondius cruise ship. 35 cases across 19 locations." />
   <meta name="twitter:image" content="https://eliseyrotar.github.io/hantavirus-tracker/og-image.png" />
-
-  <!-- Google Search Console verification -->
   <meta name="google-site-verification" content="BcrsOTEN6X5W2TrvammFRAiLtsAN_s3DWY7bbCMZKEA" />
   <script type="application/ld+json">
   {
@@ -37,14 +31,11 @@
     "@type": "WebApplication",
     "name": "Hantavirus Tracker",
     "url": "https://eliseyrotar.github.io/hantavirus-tracker/",
-    "description": "Live interactive map tracking the 2026 Andes hantavirus (ANDV) outbreak linked to the MV Hondius cruise ship. Real-time case data sourced from the ANDV Hantavirus 2026 ArcGIS dashboard.",
+    "description": "Live interactive map tracking the 2026 Andes hantavirus (ANDV) outbreak linked to the MV Hondius cruise ship.",
     "applicationCategory": "HealthApplication",
     "operatingSystem": "Any",
     "browserRequirements": "Requires JavaScript",
-    "author": {
-      "@type": "Person",
-      "name": "EliseyRotar"
-    },
+    "author": { "@type": "Person", "name": "EliseyRotar" },
     "about": {
       "@type": "InfectiousDisease",
       "name": "Andes Hantavirus (ANDV)",
@@ -64,57 +55,46 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-...
-      --glass:     blur(12px);
+      --bg:       #0d1117;
+      --surface:  #161b22;
+      --surface2: #21262d;
+      --border:   #30363d;
+      --accent:   #f0883e;
+      --red:      #e05252;
+      --orange:   #e07b52;
+      --purple:   #9b59b6;
+      --blue:     #3498db;
+      --text:     #e6edf3;
+      --muted:    #8b949e;
+      --sidebar-w: 300px;
     }
 
     html, body {
-...
-    }
-
-    /* ── Loading Overlay ── */
-    #loading-overlay {
-      position: fixed; inset: 0;
+      height: 100%;
       background: var(--bg);
-      z-index: 5000;
-      display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      gap: 20px;
-      transition: opacity 0.6s ease, visibility 0.6s;
-    }
-    #loading-overlay.hidden { opacity: 0; visibility: hidden; }
-
-    .loader-virus {
-      width: 60px; height: 60px;
-      background: radial-gradient(circle at 35% 35%, #ef4444 0%, #7f1d1d 100%);
-      border-radius: 50%;
-      box-shadow: 0 0 30px rgba(239,68,68,0.4);
-      position: relative;
-      animation: loader-pulse 2s ease-in-out infinite;
-    }
-    @keyframes loader-pulse {
-      0%, 100% { transform: scale(1); filter: brightness(1); }
-      50% { transform: scale(1.1); filter: brightness(1.3); }
+      color: var(--text);
+      font-family: system-ui, -apple-system, sans-serif;
+      font-size: 14px;
+      line-height: 1.5;
+      overflow: hidden;
     }
 
-    .loader-text {
-      font-size: 14px; font-weight: 600; color: var(--cyan);
-      letter-spacing: 1px; text-transform: uppercase;
-      animation: loader-fade 2s ease-in-out infinite;
-    }
-    @keyframes loader-fade {
-      0%, 100% { opacity: 0.5; }
-      50% { opacity: 1; }
+    /* ── App shell ── */
+    #app {
+      display: flex;
+      flex-direction: row;
+      height: 100%;
+      width: 100%;
     }
 
-    /* ── Sidebar ── */
+    /* ═══════════════════════════════════════════════════════════════
+       SIDEBAR
+    ═══════════════════════════════════════════════════════════════ */
     #sidebar {
       width: var(--sidebar-w);
       min-width: 280px;
       height: 100%;
       background: var(--surface);
-      backdrop-filter: var(--glass);
-      -webkit-backdrop-filter: var(--glass);
       border-right: 1px solid var(--border);
       display: flex;
       flex-direction: column;
@@ -123,30 +103,25 @@
       z-index: 20;
     }
 
-    #sidebar-header {
-      padding: 18px 18px 14px;
-      background: linear-gradient(160deg, #080c14 0%, #0d1a3a 100%);
+    #sidebar-top {
+      padding: 16px 18px 14px;
       border-bottom: 1px solid var(--border);
       flex-shrink: 0;
     }
 
-    .logo-row { display: flex; align-items: center; gap: 12px; }
-
-    .logo-icon {
-      width: 38px; height: 38px;
-      background: radial-gradient(circle at 35% 35%, #ef4444 0%, #7f1d1d 100%);
-      border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 18px;
-      box-shadow: 0 0 18px rgba(239,68,68,0.5);
-      flex-shrink: 0;
+    .brand {
+      font-family: 'SF Mono', ui-monospace, 'Cascadia Code', monospace;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--text);
     }
 
-    .logo-text h1 {
-      font-size: 15px; font-weight: 700; color: #f1f5f9; letter-spacing: -0.3px;
-    }
-    .logo-text p {
-      font-size: 10px; color: #f59e0b; font-weight: 500; margin-top: 3px;
+    .brand-sub {
+      font-size: 11px;
+      color: var(--accent);
+      margin-top: 3px;
       letter-spacing: 0.3px;
     }
 
@@ -162,189 +137,284 @@
 
     .stat-cell {
       background: var(--surface2);
-      padding: 10px 4px;
+      padding: 8px 4px;
       text-align: center;
-      transition: background 0.15s;
     }
-    .stat-cell:hover { background: #1c2a42; }
 
     .stat-num {
-      font-size: 20px; font-weight: 700; line-height: 1;
+      font-size: 18px;
+      font-weight: 700;
+      line-height: 1;
       font-variant-numeric: tabular-nums;
-    }
-    .stat-lbl {
-      font-size: 8.5px; text-transform: uppercase; letter-spacing: 0.8px;
-      color: var(--muted); margin-top: 3px;
+      font-family: 'SF Mono', ui-monospace, monospace;
     }
 
-    .stat-confirmed .stat-num  { color: var(--red); }
-    .stat-suspected .stat-num  { color: var(--orange); }
-    .stat-deceased  .stat-num  { color: var(--purple); }
-    .stat-monitoring .stat-num { color: var(--sky); }
+    .stat-lbl {
+      font-size: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--muted);
+      margin-top: 3px;
+    }
+
+    .stat-confirmed  .stat-num { color: var(--red); }
+    .stat-suspected  .stat-num { color: var(--orange); }
+    .stat-deceased   .stat-num { color: var(--purple); }
+    .stat-monitoring .stat-num { color: var(--blue); }
 
     /* ── Sidebar body ── */
     #sidebar-body {
-      flex: 1; overflow-y: auto;
-      padding: 16px 16px 24px;
-      display: flex; flex-direction: column; gap: 18px;
+      flex: 1;
+      overflow-y: auto;
+      padding: 14px 16px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
     }
 
-    #sidebar-body::-webkit-scrollbar { width: 4px; }
+    #sidebar-body::-webkit-scrollbar { width: 3px; }
     #sidebar-body::-webkit-scrollbar-track { background: transparent; }
     #sidebar-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
 
     .section-title {
-      font-size: 10px; font-weight: 600;
-      text-transform: uppercase; letter-spacing: 1.2px;
-      color: var(--muted); margin-bottom: 10px;
-      display: flex; align-items: center; gap: 8px;
-    }
-    .section-title::after {
-      content: ''; flex: 1; height: 1px; background: var(--border);
+      font-family: 'SF Mono', ui-monospace, monospace;
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--muted);
+      margin-bottom: 8px;
     }
 
     #disclaimer {
-      background: rgba(239,68,68,0.07);
-      border: 1px solid rgba(239,68,68,0.25);
-      border-radius: 8px; padding: 10px 12px;
-      font-size: 11px; line-height: 1.55; color: #fca5a5;
+      background: rgba(224, 82, 82, 0.06);
+      border: 1px solid rgba(224, 82, 82, 0.2);
+      border-radius: 4px;
+      padding: 9px 11px;
+      font-size: 11px;
+      line-height: 1.55;
+      color: #c9a0a0;
     }
-    #disclaimer strong { color: #f87171; display: block; margin-bottom: 3px; }
+    #disclaimer strong {
+      color: var(--red);
+      display: block;
+      margin-bottom: 3px;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
 
     /* ── Filter controls ── */
     .filter-group { display: flex; flex-direction: column; gap: 6px; }
+
     .filter-label {
-      font-size: 11px; color: var(--muted); font-weight: 500;
-      margin-bottom: 2px;
+      font-family: 'SF Mono', ui-monospace, monospace;
+      font-size: 10px;
+      color: var(--muted);
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 4px;
     }
 
     .checkbox-row {
-      display: flex; align-items: center; gap: 9px;
-      padding: 7px 9px; border-radius: 7px;
-      cursor: pointer; transition: background 0.15s;
-      font-size: 13px; min-height: 36px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 5px 7px;
+      border-radius: 3px;
+      cursor: pointer;
+      transition: background 0.12s;
+      font-size: 12px;
+      min-height: 30px;
       user-select: none;
     }
     .checkbox-row:hover { background: var(--surface2); }
+
     .checkbox-row input[type=checkbox] {
-      width: 15px; height: 15px; accent-color: var(--accent);
-      cursor: pointer; flex-shrink: 0;
+      width: 13px;
+      height: 13px;
+      accent-color: var(--accent);
+      cursor: pointer;
+      flex-shrink: 0;
     }
 
-    .dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+    .status-swatch {
+      width: 9px;
+      height: 9px;
+      border-radius: 2px;
+      flex-shrink: 0;
+      display: inline-block;
+    }
 
     select, input[type=date] {
       width: 100%;
-      background: var(--surface2); border: 1px solid var(--border);
-      color: var(--text); font-size: 13px;
-      padding: 8px 10px; border-radius: 7px; outline: none;
-      transition: border-color 0.15s, box-shadow 0.15s;
-      min-height: 38px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-size: 12px;
+      padding: 6px 8px;
+      border-radius: 3px;
+      outline: none;
+      transition: border-color 0.12s;
       -webkit-appearance: none;
     }
     select:focus, input[type=date]:focus {
       border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(59,130,246,0.15);
     }
 
-    .date-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .date-row { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
 
     .btn-reset {
-      width: 100%; padding: 9px;
-      background: var(--surface2); border: 1px solid var(--border);
-      color: var(--muted); font-size: 12px; border-radius: 7px;
-      cursor: pointer; transition: all 0.15s; font-weight: 500;
-      min-height: 36px;
+      width: 100%;
+      padding: 7px;
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 11px;
+      font-family: 'SF Mono', ui-monospace, monospace;
+      letter-spacing: 0.5px;
+      border-radius: 3px;
+      cursor: pointer;
+      transition: all 0.12s;
+      text-transform: uppercase;
     }
-    .btn-reset:hover { background: var(--border); color: var(--text); }
+    .btn-reset:hover { background: var(--surface2); color: var(--text); border-color: var(--muted); }
 
     /* ── Legend ── */
     .legend-item {
-      display: flex; align-items: center; gap: 9px;
-      font-size: 12px; padding: 3px 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      padding: 2px 0;
     }
-    .legend-dot  { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+
+    .legend-swatch {
+      width: 10px;
+      height: 10px;
+      border-radius: 2px;
+      flex-shrink: 0;
+    }
+
     .legend-line {
-      width: 24px; height: 2px; flex-shrink: 0;
-      background: repeating-linear-gradient(90deg,#06b6d4 0,#06b6d4 5px,transparent 5px,transparent 9px);
+      width: 22px;
+      height: 2px;
+      flex-shrink: 0;
+      background: repeating-linear-gradient(90deg, #06b6d4 0, #06b6d4 5px, transparent 5px, transparent 9px);
     }
-    .legend-pulse {
-      width: 12px; height: 12px; border-radius: 50%;
-      background: rgba(239,68,68,0.45); border: 2px solid #ef4444; flex-shrink: 0;
+
+    .legend-pulse-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: rgba(224, 82, 82, 0.4);
+      border: 2px solid var(--red);
+      flex-shrink: 0;
       animation: pulse-legend 1.8s ease-out infinite;
     }
+
     @keyframes pulse-legend {
-      0%   { box-shadow: 0 0 0 0 rgba(239,68,68,0.6); }
-      70%  { box-shadow: 0 0 0 8px rgba(239,68,68,0); }
-      100% { box-shadow: 0 0 0 0 rgba(239,68,68,0); }
+      0%   { box-shadow: 0 0 0 0 rgba(224, 82, 82, 0.6); }
+      70%  { box-shadow: 0 0 0 7px rgba(224, 82, 82, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(224, 82, 82, 0); }
     }
 
     /* ── Last updated / sources ── */
-    #last-updated { font-size: 12px; color: var(--cyan); font-weight: 500; }
+    #last-updated {
+      font-size: 12px;
+      color: var(--blue);
+      font-family: 'SF Mono', ui-monospace, monospace;
+    }
 
     .source-row {
-      display: flex; justify-content: space-between; align-items: center;
-      padding: 5px 0; font-size: 11px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 4px 0;
+      font-size: 11px;
       border-bottom: 1px solid var(--border);
     }
     .source-row:last-child { border-bottom: none; }
     .source-name { color: var(--text); font-weight: 500; }
     .source-time { color: var(--muted); }
-    .source-dot  { width: 6px; height: 6px; border-radius: 50%; background: #22c55e; flex-shrink: 0; }
+    .source-dot  { width: 5px; height: 5px; border-radius: 50%; background: #22c55e; flex-shrink: 0; }
 
     .ext-link {
-      display: flex; align-items: center; gap: 7px;
-      padding: 8px 9px; border-radius: 7px;
-      font-size: 12px; color: var(--accent); text-decoration: none;
-      transition: background 0.15s; min-height: 36px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 7px;
+      border-radius: 3px;
+      font-size: 11px;
+      color: var(--accent);
+      text-decoration: none;
+      transition: background 0.12s;
+      min-height: 30px;
     }
-    .ext-link:hover { background: var(--surface2); color: var(--cyan); }
+    .ext-link:hover { background: var(--surface2); color: var(--text); }
 
     #sidebar-footer {
-      padding: 10px 16px; border-top: 1px solid var(--border);
-      font-size: 10px; color: var(--muted); flex-shrink: 0;
-      display: flex; justify-content: space-between; align-items: center;
+      padding: 9px 16px;
+      border-top: 1px solid var(--border);
+      font-size: 10px;
+      color: var(--muted);
+      flex-shrink: 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
       gap: 8px;
+      line-height: 1.4;
     }
     #sidebar-footer a { color: var(--muted); text-decoration: none; }
     #sidebar-footer a:hover { color: var(--text); }
 
-    /* ── Map container (desktop) ── */
+    /* ═══════════════════════════════════════════════════════════════
+       MAP WRAPPER
+    ═══════════════════════════════════════════════════════════════ */
     #map-wrapper {
-      flex: 1; min-width: 0;
+      flex: 1;
+      min-width: 0;
       position: relative;
     }
 
     #map {
-      position: absolute; inset: 0;
-      width: 100%; height: 100%;
-      background: #080c14;
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      background: #0d1117;
     }
 
-    /* ── Map overlays ── */
-    #map-overlay-top {
-      position: absolute; top: 12px; right: 12px;
-      z-index: 1000; pointer-events: none;
-    }
-
-    .map-badge {
-      background: rgba(8,12,20,0.88);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
+    #map-badge {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      z-index: 1000;
+      background: rgba(13, 17, 23, 0.9);
       border: 1px solid var(--border);
-      border-radius: 8px; padding: 7px 13px;
-      font-size: 11px; color: var(--text);
-      pointer-events: auto; white-space: nowrap;
+      border-radius: 3px;
+      padding: 5px 11px;
+      font-size: 11px;
+      color: var(--text);
+      font-family: 'SF Mono', ui-monospace, monospace;
+      pointer-events: none;
+      white-space: nowrap;
     }
-    .map-badge strong { color: var(--cyan); }
+    #map-badge strong { color: var(--blue); }
 
     /* ── Staleness banner ── */
     #staleness-warning {
       display: none;
-      position: fixed; top: 0; left: 0; right: 0; z-index: 9999;
-      background: linear-gradient(90deg, #92400e, #b45309);
-      color: #fef3c7; text-align: center;
-      padding: 8px 16px; font-size: 12px; font-weight: 600;
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 9999;
+      background: #92400e;
+      color: #fef3c7;
+      text-align: center;
+      padding: 7px 16px;
+      font-size: 11px;
+      font-weight: 600;
     }
     #staleness-warning.visible { display: block; }
 
@@ -355,50 +425,54 @@
       100% { transform: scale(2.8); opacity: 0; }
     }
     .pulse-marker {
-      width: 14px; height: 14px; border-radius: 50%;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
       position: relative;
     }
     .pulse-marker::after {
-      content: ''; position: absolute; inset: -3px;
-      border-radius: 50%; border: 2px solid currentColor;
+      content: '';
+      position: absolute;
+      inset: -3px;
+      border-radius: 50%;
+      border: 2px solid currentColor;
       animation: pulse-ring 1.8s ease-out infinite;
     }
 
     /* ── Leaflet dark theme overrides ── */
-    .leaflet-container { background: #080c14 !important; }
+    .leaflet-container { background: #0d1117 !important; }
     .leaflet-popup-content-wrapper {
-      background: #0f1623 !important;
-      border: 1px solid #1e3050 !important;
-      border-radius: 10px !important;
+      background: #161b22 !important;
+      border: 1px solid var(--border) !important;
+      border-radius: 4px !important;
       box-shadow: 0 8px 32px rgba(0,0,0,0.7) !important;
-      color: #e2e8f0 !important;
+      color: var(--text) !important;
     }
-    .leaflet-popup-tip { background: #0f1623 !important; }
-    .leaflet-popup-close-button {
-      color: #64748b !important; font-size: 18px !important;
-      top: 6px !important; right: 8px !important;
-    }
-    .leaflet-popup-close-button:hover { color: #e2e8f0 !important; }
+    .leaflet-popup-tip { background: #161b22 !important; }
+    .leaflet-popup-close-button { color: var(--muted) !important; font-size: 18px !important; top: 6px !important; right: 8px !important; }
+    .leaflet-popup-close-button:hover { color: var(--text) !important; }
     .leaflet-tooltip {
-      background: rgba(8,12,20,0.93) !important;
-      border: 1px solid #1e3050 !important;
-      color: #e2e8f0 !important; font-size: 11px !important;
-      border-radius: 6px !important;
+      background: rgba(13, 17, 23, 0.95) !important;
+      border: 1px solid var(--border) !important;
+      color: var(--text) !important;
+      font-size: 11px !important;
+      border-radius: 3px !important;
       box-shadow: 0 4px 12px rgba(0,0,0,0.5) !important;
     }
-    .leaflet-tooltip-top::before { border-top-color: #1e3050 !important; }
+    .leaflet-tooltip-top::before { border-top-color: var(--border) !important; }
     .marker-cluster-small,
     .marker-cluster-medium,
     .marker-cluster-large {
-      background: rgba(59,130,246,0.12) !important;
-      border: 2px solid rgba(59,130,246,0.45) !important;
+      background: rgba(52, 152, 219, 0.12) !important;
+      border: 2px solid rgba(52, 152, 219, 0.45) !important;
     }
     .marker-cluster-small div,
     .marker-cluster-medium div,
     .marker-cluster-large div {
-      background: rgba(59,130,246,0.25) !important;
+      background: rgba(52, 152, 219, 0.25) !important;
       color: #93c5fd !important;
-      font-weight: 700 !important; font-size: 12px !important;
+      font-weight: 700 !important;
+      font-size: 12px !important;
     }
 
     /* ═══════════════════════════════════════════════════════════════
@@ -409,86 +483,111 @@
       top: 0; right: 0; bottom: 0;
       width: 360px;
       background: var(--surface);
-      backdrop-filter: var(--glass);
-      -webkit-backdrop-filter: var(--glass);
       border-left: 1px solid var(--border);
       z-index: 2000;
-      display: flex; flex-direction: column;
+      display: flex;
+      flex-direction: column;
       transform: translateX(100%);
-      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-      box-shadow: -10px 0 50px rgba(0,0,0,0.7);
+      transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: -8px 0 40px rgba(0,0,0,0.6);
       overflow: hidden;
     }
     #case-panel.open { transform: translateX(0); }
 
     #case-panel-header {
-      padding: 16px 18px;
-      background: linear-gradient(160deg, #080c14 0%, #0d1a3a 100%);
+      padding: 14px 16px;
       border-bottom: 1px solid var(--border);
-      display: flex; align-items: flex-start; gap: 12px;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
       flex-shrink: 0;
+      background: var(--surface2);
     }
     #case-panel-header .panel-title-block { flex: 1; min-width: 0; }
     #case-panel-header .panel-case-num {
-      font-size: 11px; color: var(--muted); font-weight: 500;
-      text-transform: uppercase; letter-spacing: 0.8px;
+      font-family: 'SF Mono', ui-monospace, monospace;
+      font-size: 10px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
     }
     #case-panel-header .panel-location {
-      font-size: 16px; font-weight: 700; color: #f1f5f9;
-      margin-top: 3px; line-height: 1.3;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text);
+      margin-top: 3px;
+      line-height: 1.3;
     }
     #case-panel-header .panel-status-badge {
-      display: inline-flex; align-items: center; gap: 5px;
-      padding: 3px 9px; border-radius: 20px;
-      font-size: 11px; font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 2px 8px;
+      border-radius: 2px;
+      font-size: 10px;
+      font-weight: 600;
+      font-family: 'SF Mono', ui-monospace, monospace;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
       margin-top: 6px;
     }
 
     #case-panel-close {
-      background: none; border: none; cursor: pointer;
-      color: var(--muted); font-size: 20px; line-height: 1;
-      padding: 2px 4px; border-radius: 4px;
-      transition: color 0.15s, background 0.15s;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--muted);
+      font-size: 18px;
+      line-height: 1;
+      padding: 2px 4px;
+      border-radius: 3px;
+      transition: color 0.12s, background 0.12s;
       flex-shrink: 0;
     }
-    #case-panel-close:hover { color: var(--text); background: var(--surface2); }
+    #case-panel-close:hover { color: var(--text); background: var(--border); }
 
     #case-panel-body {
-      flex: 1; overflow-y: auto; padding: 18px;
-      display: flex; flex-direction: column; gap: 16px;
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
     }
-    #case-panel-body::-webkit-scrollbar { width: 4px; }
+    #case-panel-body::-webkit-scrollbar { width: 3px; }
     #case-panel-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
 
-    .panel-field {
-      display: flex; flex-direction: column; gap: 3px;
-    }
+    .panel-field { display: flex; flex-direction: column; gap: 3px; }
     .panel-field-label {
-      font-size: 10px; text-transform: uppercase; letter-spacing: 0.9px;
-      color: var(--muted); font-weight: 600;
+      font-family: 'SF Mono', ui-monospace, monospace;
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: var(--muted);
+      font-weight: 600;
     }
     .panel-field-value {
-      font-size: 13px; color: var(--text); line-height: 1.5;
+      font-size: 13px;
+      color: var(--text);
+      line-height: 1.5;
     }
-    .panel-field-value a {
-      color: var(--accent); text-decoration: none;
-    }
-    .panel-field-value a:hover { color: var(--cyan); text-decoration: underline; }
+    .panel-field-value a { color: var(--accent); text-decoration: none; }
+    .panel-field-value a:hover { color: var(--text); text-decoration: underline; }
 
-    .panel-divider {
-      height: 1px; background: var(--border); margin: 2px 0;
-    }
+    .panel-divider { height: 1px; background: var(--border); margin: 2px 0; }
 
     .panel-notes {
-      background: var(--surface2); border-radius: 8px;
-      padding: 12px 14px; font-size: 12px; line-height: 1.65;
-      color: #94a3b8; border: 1px solid var(--border);
+      background: var(--surface2);
+      border-radius: 3px;
+      padding: 10px 12px;
+      font-size: 12px;
+      line-height: 1.65;
+      color: var(--muted);
+      border: 1px solid var(--border);
     }
 
     /* ═══════════════════════════════════════════════════════════════
-       MOBILE LAYOUT (<768px)
-       CRITICAL: flex column — topbar → map-wrapper → bottom-sheet
-       The map NEVER gets covered.
+       MOBILE LAYOUT
     ═══════════════════════════════════════════════════════════════ */
     @media (max-width: 767px) {
       html, body {
@@ -498,7 +597,6 @@
         overflow: hidden;
       }
 
-      /* The #app wrapper is not needed on mobile — body IS the flex container */
       #app {
         flex: 1;
         display: flex;
@@ -507,12 +605,10 @@
         overflow: hidden;
       }
 
-      /* ── Topbar: fixed height, NOT position:fixed ── */
       #topbar {
-        height: 56px;
+        height: 48px;
         flex-shrink: 0;
-        position: relative;
-        background: rgba(8,12,20,0.97);
+        background: var(--surface);
         border-bottom: 1px solid var(--border);
         display: flex;
         align-items: center;
@@ -521,92 +617,85 @@
         z-index: 10;
       }
 
-      .topbar-logo { display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0; }
-      .topbar-logo-icon {
-        width: 30px; height: 30px;
-        background: radial-gradient(circle at 35% 35%, #ef4444 0%, #7f1d1d 100%);
-        border-radius: 50%; display: flex; align-items: center; justify-content: center;
-        font-size: 15px; box-shadow: 0 0 12px rgba(239,68,68,0.45); flex-shrink: 0;
+      .topbar-brand { flex: 1; min-width: 0; }
+      .topbar-brand-name {
+        font-family: 'SF Mono', ui-monospace, monospace;
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        color: var(--text);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
       }
-      .topbar-logo-text h1 {
-        font-size: 13px; font-weight: 700; color: #f1f5f9;
-        white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-      }
-      .topbar-logo-text p { font-size: 9.5px; color: #f59e0b; }
+      .topbar-brand-sub { font-size: 9px; color: var(--accent); margin-top: 1px; }
 
-      #topbar-stats {
-        display: flex; gap: 10px; flex-shrink: 0;
-      }
+      #topbar-stats { display: flex; gap: 10px; flex-shrink: 0; }
       .topbar-stat { text-align: center; }
       .topbar-stat-num {
-        font-size: 15px; font-weight: 700; line-height: 1;
+        font-size: 14px;
+        font-weight: 700;
+        line-height: 1;
         font-variant-numeric: tabular-nums;
+        font-family: 'SF Mono', ui-monospace, monospace;
       }
-      .topbar-stat-lbl {
-        font-size: 8px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted);
-      }
-      .ts-confirmed .topbar-stat-num  { color: var(--red); }
-      .ts-suspected .topbar-stat-num  { color: var(--orange); }
-      .ts-deceased  .topbar-stat-num  { color: var(--purple); }
-      .ts-monitoring .topbar-stat-num { color: var(--sky); }
+      .topbar-stat-lbl { font-size: 7px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted); }
+      .ts-confirmed  .topbar-stat-num { color: var(--red); }
+      .ts-suspected  .topbar-stat-num { color: var(--orange); }
+      .ts-deceased   .topbar-stat-num { color: var(--purple); }
+      .ts-monitoring .topbar-stat-num { color: var(--blue); }
 
-      /* ── Map wrapper: flex:1, shrinks when sheet expands ── */
-      #map-wrapper {
-        flex: 1;
-        position: relative;
-        min-height: 0;
-      }
+      #map-wrapper { flex: 1; position: relative; min-height: 0; }
+      #map { position: absolute; inset: 0; width: 100%; height: 100%; }
 
-      #map {
-        position: absolute;
-        inset: 0;
-        width: 100%;
-        height: 100%;
-      }
-
-      /* ── Bottom sheet: flex-shrink:0, height transitions ── */
       #bottom-sheet {
         flex-shrink: 0;
         background: var(--surface);
         border-top: 1px solid var(--border);
-        border-radius: 16px 16px 0 0;
-        box-shadow: 0 -6px 30px rgba(0,0,0,0.5);
+        border-radius: 12px 12px 0 0;
+        box-shadow: 0 -4px 24px rgba(0,0,0,0.5);
         overflow: hidden;
-        /* Collapsed: only handle visible */
         height: 44px;
-        max-height: 70dvh;
-        transition: height 0.35s cubic-bezier(0.4,0,0.2,1);
+        max-height: 65dvh;
+        transition: height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         z-index: 10;
       }
-
-      #bottom-sheet.expanded {
-        height: 70dvh;
-      }
+      #bottom-sheet.expanded { height: 65dvh; }
 
       .sheet-handle {
         height: 44px;
-        display: flex; flex-direction: column;
-        align-items: center; justify-content: center;
-        gap: 6px; cursor: pointer;
-        background: linear-gradient(160deg, #0d1220 0%, #0f1a30 100%);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+        cursor: pointer;
+        background: var(--surface2);
         flex-shrink: 0;
         user-select: none;
         -webkit-tap-highlight-color: transparent;
       }
-
       .sheet-handle-bar {
-        width: 36px; height: 4px;
-        background: rgba(255,255,255,0.18);
+        width: 32px;
+        height: 3px;
+        background: var(--border);
         border-radius: 2px;
       }
-
       .sheet-handle-label {
-        font-size: 11px; font-weight: 600; color: var(--muted);
-        display: flex; align-items: center; gap: 6px;
+        font-family: 'SF Mono', ui-monospace, monospace;
+        font-size: 10px;
+        font-weight: 600;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        display: flex;
+        align-items: center;
+        gap: 5px;
       }
-
       .sheet-chevron {
-        font-size: 10px; color: var(--muted);
+        font-size: 9px;
+        color: var(--muted);
         transition: transform 0.3s;
         display: inline-block;
       }
@@ -614,20 +703,18 @@
 
       .sheet-content {
         overflow-y: auto;
-        height: calc(70dvh - 44px);
-        padding: 14px 16px 24px;
-        display: flex; flex-direction: column; gap: 16px;
+        height: calc(65dvh - 44px);
+        padding: 12px 14px 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
       }
       .sheet-content::-webkit-scrollbar { width: 3px; }
       .sheet-content::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
 
-      /* Hide desktop sidebar on mobile */
       #sidebar { display: none; }
+      #map-badge { top: 8px; right: 8px; }
 
-      /* Map overlay position on mobile */
-      #map-overlay-top { top: 10px; right: 10px; }
-
-      /* Case panel on mobile: slides up from bottom */
       #case-panel {
         top: auto;
         left: 0; right: 0; bottom: 0;
@@ -635,20 +722,16 @@
         height: 80dvh;
         border-left: none;
         border-top: 1px solid var(--border);
-        border-radius: 16px 16px 0 0;
+        border-radius: 12px 12px 0 0;
         transform: translateY(100%);
-        box-shadow: 0 -8px 40px rgba(0,0,0,0.7);
+        box-shadow: 0 -6px 32px rgba(0,0,0,0.7);
       }
       #case-panel.open { transform: translateY(0); }
 
-      /* Hide desktop stats bar on mobile */
       #stats-bar { display: none; }
-
-      /* Staleness banner on mobile */
-      #staleness-warning { font-size: 11px; padding: 6px 12px; }
+      #staleness-warning { font-size: 10px; padding: 5px 12px; }
     }
 
-    /* Desktop: hide mobile-only elements */
     @media (min-width: 768px) {
       #topbar       { display: none; }
       #bottom-sheet { display: none; }
@@ -657,27 +740,16 @@
 </head>
 <body>
 
-  <!-- Loading Overlay -->
-  <div id="loading-overlay">
-    <div class="loader-virus"></div>
-    <div class="loader-text">Loading Surveillance Data...</div>
-  </div>
-
   <!-- Staleness Warning -->
   <div id="staleness-warning" role="alert" aria-live="assertive">
-    ⚠ Data may be outdated — last update was more than 24 hours ago.
+    Data may be outdated — last update was more than 24 hours ago.
   </div>
 
-  <!-- ═══════════════════════════════════════════════════════════════
-       MOBILE TOPBAR (hidden on desktop)
-  ═══════════════════════════════════════════════════════════════ -->
+  <!-- Mobile Topbar (hidden on desktop) -->
   <div id="topbar" role="banner">
-    <div class="topbar-logo">
-      <div class="topbar-logo-icon" aria-hidden="true">🦠</div>
-      <div class="topbar-logo-text">
-        <h1>Hantavirus Tracker</h1>
-        <p>⚡ Live Surveillance</p>
-      </div>
+    <div class="topbar-brand">
+      <div class="topbar-brand-name">Hantavirus Tracker</div>
+      <div class="topbar-brand-sub">MV Hondius · 2026 Outbreak</div>
     </div>
     <div id="topbar-stats" aria-label="Case counts">
       <div class="topbar-stat ts-confirmed">
@@ -699,25 +771,17 @@
     </div>
   </div>
 
-  <!-- ═══════════════════════════════════════════════════════════════
-       MAIN APP WRAPPER
-  ═══════════════════════════════════════════════════════════════ -->
+  <!-- Main App Wrapper -->
   <div id="app">
 
-    <!-- ── Desktop Sidebar ── -->
+    <!-- Desktop Sidebar -->
     <aside id="sidebar" role="complementary" aria-label="Tracker controls">
 
-      <div id="sidebar-header">
-        <div class="logo-row">
-          <div class="logo-icon" aria-hidden="true">🦠</div>
-          <div class="logo-text">
-            <h1>Hantavirus Tracker</h1>
-            <p>⚡ Live Global Surveillance</p>
-          </div>
-        </div>
+      <div id="sidebar-top">
+        <div class="brand">Hantavirus Tracker</div>
+        <div class="brand-sub">MV Hondius · 2026 Outbreak</div>
       </div>
 
-      <!-- Stats bar: 4 cells -->
       <div id="stats-bar" aria-label="Case counts">
         <div class="stat-cell stat-confirmed">
           <div class="stat-num" id="count-confirmed">—</div>
@@ -737,11 +801,10 @@
         </div>
       </div>
 
-      <!-- Scrollable body -->
       <div id="sidebar-body">
 
         <div id="disclaimer" role="note">
-          <strong>⚠ Medical Disclaimer</strong>
+          <strong>Medical Disclaimer</strong>
           For informational purposes only. Data may be incomplete or delayed.
           Consult a healthcare professional for medical advice.
         </div>
@@ -753,26 +816,26 @@
 
         <section aria-labelledby="legend-heading">
           <div class="section-title" id="legend-heading">Legend</div>
-          <div style="display:flex;flex-direction:column;gap:7px;">
+          <div style="display:flex;flex-direction:column;gap:6px;">
             <div class="legend-item">
-              <div class="legend-dot" style="background:var(--red);" aria-hidden="true"></div>
+              <div class="legend-swatch" style="background:var(--red);" aria-hidden="true"></div>
               <span>Confirmed</span>
             </div>
             <div class="legend-item">
-              <div class="legend-dot" style="background:var(--orange);" aria-hidden="true"></div>
+              <div class="legend-swatch" style="background:var(--orange);" aria-hidden="true"></div>
               <span>Suspected</span>
             </div>
             <div class="legend-item">
-              <div class="legend-dot" style="background:var(--purple);" aria-hidden="true"></div>
+              <div class="legend-swatch" style="background:var(--purple);" aria-hidden="true"></div>
               <span>Deceased</span>
             </div>
             <div class="legend-item">
-              <div class="legend-dot" style="background:var(--sky);" aria-hidden="true"></div>
+              <div class="legend-swatch" style="background:var(--blue);" aria-hidden="true"></div>
               <span>Monitoring</span>
             </div>
             <div class="legend-item">
-              <div class="legend-pulse" aria-hidden="true"></div>
-              <span>Andes virus (pulsing)</span>
+              <div class="legend-pulse-dot" aria-hidden="true"></div>
+              <span>Andes virus (pulsing marker)</span>
             </div>
             <div class="legend-item">
               <div class="legend-line" aria-hidden="true"></div>
@@ -783,30 +846,30 @@
 
         <section aria-labelledby="updated-heading">
           <div class="section-title" id="updated-heading">Last Updated</div>
-          <div id="last-updated" aria-live="polite">Loading…</div>
+          <div id="last-updated" aria-live="polite">Loading...</div>
         </section>
 
         <section aria-labelledby="sources-heading">
           <div class="section-title" id="sources-heading">Data Sources</div>
           <div id="source-timestamps" aria-live="polite">
-            <div class="source-row"><span class="source-name" style="color:var(--muted);">Loading…</span></div>
+            <div class="source-row"><span class="source-name" style="color:var(--muted);">Loading...</span></div>
           </div>
         </section>
 
         <section aria-labelledby="links-heading">
           <div class="section-title" id="links-heading">Official Sources</div>
-          <div style="display:flex;flex-direction:column;gap:2px;">
+          <div style="display:flex;flex-direction:column;gap:1px;">
             <a class="ext-link" href="https://www.arcgis.com/apps/dashboards/5c68442d2afc42d7ba2696e4cd393729" target="_blank" rel="noopener">
-              📊 ANDV Hantavirus 2026 Dashboard ↗
+              ANDV Hantavirus 2026 Dashboard ↗
             </a>
             <a class="ext-link" href="https://www.who.int/emergencies/disease-outbreak-news" target="_blank" rel="noopener">
-              🌐 WHO Disease Outbreak News ↗
+              WHO Disease Outbreak News ↗
             </a>
             <a class="ext-link" href="https://www.cdc.gov/hantavirus/" target="_blank" rel="noopener">
-              🇺🇸 CDC Hantavirus ↗
+              CDC Hantavirus ↗
             </a>
             <a class="ext-link" href="https://www.ecdc.europa.eu/en/hantavirus-infection" target="_blank" rel="noopener">
-              🇪🇺 ECDC Hantavirus ↗
+              ECDC Hantavirus ↗
             </a>
           </div>
         </section>
@@ -820,19 +883,15 @@
 
     </aside><!-- /sidebar -->
 
-    <!-- ── Map wrapper ── -->
-    <div id="map-wrapper">
-      <div id="map-overlay-top">
-        <div class="map-badge"><strong id="visible-count">—</strong> cases visible</div>
-      </div>
+    <!-- Map wrapper -->
+    <main id="map-wrapper">
+      <div id="map-badge"><strong id="visible-count">—</strong> cases visible</div>
       <div id="map" role="application" aria-label="Live hantavirus case map" tabindex="0"></div>
-    </div>
+    </main>
 
   </div><!-- /app -->
 
-  <!-- ═══════════════════════════════════════════════════════════════
-       MOBILE BOTTOM SHEET (hidden on desktop)
-  ═══════════════════════════════════════════════════════════════ -->
+  <!-- Mobile Bottom Sheet (hidden on desktop) -->
   <div id="bottom-sheet" role="complementary" aria-label="Filters and information">
     <div class="sheet-handle" id="sheet-handle-btn" role="button" tabindex="0"
          aria-expanded="false" aria-controls="sheet-body"
@@ -840,15 +899,10 @@
       <div class="sheet-handle-bar" aria-hidden="true"></div>
       <div class="sheet-handle-label">
         <span id="sheet-label-text">Filters &amp; Info</span>
-        <span class="sheet-chevron" aria-hidden="true">▲</span>
+        <span class="sheet-chevron" aria-hidden="true">&#9650;</span>
       </div>
     </div>
     <div class="sheet-content" id="sheet-body" aria-hidden="true">
-
-      <section aria-labelledby="m-timeline-heading">
-        <div class="section-title" id="m-timeline-heading">Outbreak Timeline</div>
-        <div id="m-timeline-controls" class="filter-group"></div>
-      </section>
 
       <section aria-labelledby="m-filters-heading">
         <div class="section-title" id="m-filters-heading">Filters</div>
@@ -857,25 +911,25 @@
 
       <section aria-labelledby="m-legend-heading">
         <div class="section-title" id="m-legend-heading">Legend</div>
-        <div style="display:flex;flex-direction:column;gap:7px;">
+        <div style="display:flex;flex-direction:column;gap:6px;">
           <div class="legend-item">
-            <div class="legend-dot" style="background:var(--red);" aria-hidden="true"></div>
+            <div class="legend-swatch" style="background:var(--red);" aria-hidden="true"></div>
             <span>Confirmed</span>
           </div>
           <div class="legend-item">
-            <div class="legend-dot" style="background:var(--orange);" aria-hidden="true"></div>
+            <div class="legend-swatch" style="background:var(--orange);" aria-hidden="true"></div>
             <span>Suspected</span>
           </div>
           <div class="legend-item">
-            <div class="legend-dot" style="background:var(--purple);" aria-hidden="true"></div>
+            <div class="legend-swatch" style="background:var(--purple);" aria-hidden="true"></div>
             <span>Deceased</span>
           </div>
           <div class="legend-item">
-            <div class="legend-dot" style="background:var(--sky);" aria-hidden="true"></div>
+            <div class="legend-swatch" style="background:var(--blue);" aria-hidden="true"></div>
             <span>Monitoring</span>
           </div>
           <div class="legend-item">
-            <div class="legend-pulse" aria-hidden="true"></div>
+            <div class="legend-pulse-dot" aria-hidden="true"></div>
             <span>Andes virus (pulsing)</span>
           </div>
           <div class="legend-item">
@@ -887,17 +941,17 @@
 
       <section aria-labelledby="m-updated-heading">
         <div class="section-title" id="m-updated-heading">Last Updated</div>
-        <div id="m-last-updated" aria-live="polite" style="font-size:12px;color:var(--cyan);font-weight:500;">Loading…</div>
+        <div id="m-last-updated" aria-live="polite" style="font-size:12px;color:var(--blue);font-family:'SF Mono',ui-monospace,monospace;">Loading...</div>
       </section>
 
       <section aria-labelledby="m-sources-heading">
         <div class="section-title" id="m-sources-heading">Official Sources</div>
-        <div style="display:flex;flex-direction:column;gap:2px;">
+        <div style="display:flex;flex-direction:column;gap:1px;">
           <a class="ext-link" href="https://www.arcgis.com/apps/dashboards/5c68442d2afc42d7ba2696e4cd393729" target="_blank" rel="noopener">
-            📊 ANDV Hantavirus 2026 Dashboard ↗
+            ANDV Hantavirus 2026 Dashboard ↗
           </a>
           <a class="ext-link" href="https://www.who.int/emergencies/disease-outbreak-news" target="_blank" rel="noopener">
-            🌐 WHO Disease Outbreak News ↗
+            WHO Disease Outbreak News ↗
           </a>
         </div>
       </section>
@@ -909,9 +963,8 @@
     </div><!-- /sheet-content -->
   </div><!-- /bottom-sheet -->
 
-  <!-- ═══════════════════════════════════════════════════════════════
-       CASE DETAIL PANEL
-  ═══════════════════════════════════════════════════════════════ -->
+
+  <!-- Case Detail Panel -->
   <div id="case-panel" role="dialog" aria-modal="true" aria-label="Case details" aria-hidden="true">
     <div id="case-panel-header">
       <div class="panel-title-block">
@@ -919,72 +972,65 @@
         <div class="panel-location" id="cp-location">—</div>
         <div id="cp-status-badge" class="panel-status-badge"></div>
       </div>
-      <button id="case-panel-close" aria-label="Close case details" onclick="closeCasePanel()">✕</button>
+      <button id="case-panel-close" aria-label="Close case details" onclick="closeCasePanel()">&#x2715;</button>
     </div>
     <div id="case-panel-body">
 
-      <!-- Location + coordinates -->
       <div class="panel-field">
-        <div class="panel-field-label">📍 Location</div>
+        <div class="panel-field-label">Location</div>
         <div class="panel-field-value" id="cp-location-detail">—</div>
-        <div class="panel-field-value" id="cp-coords" style="font-size:11px;color:var(--muted);margin-top:2px;">—</div>
+        <div class="panel-field-value" id="cp-coords" style="font-size:11px;color:var(--muted);margin-top:2px;font-family:'SF Mono',ui-monospace,monospace;"></div>
       </div>
 
       <div class="panel-divider"></div>
 
-      <!-- Onset date + Age/Sex -->
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
         <div class="panel-field">
-          <div class="panel-field-label">📅 Onset Date</div>
+          <div class="panel-field-label">Onset Date</div>
           <div class="panel-field-value" id="cp-date">—</div>
         </div>
         <div class="panel-field">
-          <div class="panel-field-label">👤 Age / Sex</div>
+          <div class="panel-field-label">Age / Sex</div>
           <div class="panel-field-value" id="cp-age-sex">—</div>
         </div>
       </div>
 
-      <!-- Exposure group -->
       <div class="panel-field">
-        <div class="panel-field-label">🏷 Exposure Group</div>
+        <div class="panel-field-label">Exposure Group</div>
         <div class="panel-field-value" id="cp-exposure">—</div>
       </div>
 
       <div class="panel-divider"></div>
 
-      <!-- Timeline context (known cases 1-10) -->
       <div class="panel-field" id="cp-timeline-section" style="display:none;">
-        <div class="panel-field-label">🕐 Timeline Context</div>
-        <div class="panel-notes" id="cp-timeline" style="font-size:12px;line-height:1.65;color:#94a3b8;"></div>
+        <div class="panel-field-label">Timeline Context</div>
+        <div class="panel-notes" id="cp-timeline"></div>
       </div>
 
-      <!-- Full details -->
       <div class="panel-field">
-        <div class="panel-field-label">📋 Details</div>
+        <div class="panel-field-label">Details</div>
         <div class="panel-notes" id="cp-notes">—</div>
       </div>
 
       <div class="panel-divider"></div>
 
-      <!-- Source link -->
       <div class="panel-field">
-        <div class="panel-field-label">🔗 Source</div>
+        <div class="panel-field-label">Source</div>
         <div class="panel-field-value" id="cp-source">—</div>
       </div>
 
-      <!-- Official reference links -->
       <div class="panel-field">
-        <div class="panel-field-label">📚 Official References</div>
-        <div style="display:flex;flex-direction:column;gap:5px;margin-top:4px;">
-          <a class="ext-link" style="padding:5px 7px;font-size:11px;"
+        <div class="panel-field-label">Official References</div>
+        <div style="display:flex;flex-direction:column;gap:4px;margin-top:4px;">
+          <a class="ext-link" style="padding:4px 6px;font-size:11px;"
              href="https://www.who.int/emergencies/disease-outbreak-news/item/2026-DON599"
-             target="_blank" rel="noopener">🌐 WHO DON599 — Andes Hantavirus ↗</a>
-          <a class="ext-link" style="padding:5px 7px;font-size:11px;"
+             target="_blank" rel="noopener">WHO DON599 — Andes Hantavirus ↗</a>
+          <a class="ext-link" style="padding:4px 6px;font-size:11px;"
              href="https://www.ecdc.europa.eu/en/infectious-disease-topics/hantavirus-infection/surveillance-and-updates/andes-hantavirus-outbreak"
-             target="_blank" rel="noopener">🇪🇺 ECDC — Andes Hantavirus Outbreak ↗</a>
-          <a class="ext-link" style="padding:5px 7px;font-size:11px;"
+             target="_blank" rel="noopener">ECDC — Andes Hantavirus Outbreak ↗</a>
+          <a class="ext-link" style="padding:4px 6px;font-size:11px;"
              href="https://www.reddit.com/r/ContagionCuriosity/comments/1t5i3u3/hantavirus_outbreak_timeline/"
-             target="_blank" rel="noopener">📖 Reddit — Outbreak Timeline ↗</a>
+             target="_blank" rel="noopener">Reddit — Outbreak Timeline ↗</a>
         </div>
       </div>
 
@@ -1005,57 +1051,53 @@
       var btn   = document.getElementById('sheet-handle-btn');
       if (sheetOpen) {
         sheet.classList.add('expanded');
-        if (body)  body.setAttribute('aria-hidden', 'false');
-        if (btn)   btn.setAttribute('aria-expanded', 'true');
+        if (body) body.setAttribute('aria-hidden', 'false');
+        if (btn)  btn.setAttribute('aria-expanded', 'true');
       } else {
         sheet.classList.remove('expanded');
-        if (body)  body.setAttribute('aria-hidden', 'true');
-        if (btn)   btn.setAttribute('aria-expanded', 'false');
+        if (body) body.setAttribute('aria-hidden', 'true');
+        if (btn)  btn.setAttribute('aria-expanded', 'false');
       }
-      /* Invalidate map size so it fills the new space */
       if (window.mapState && window.mapState.map) {
-        setTimeout(function () { window.mapState.map.invalidateSize(); }, 360);
+        setTimeout(function () { window.mapState.map.invalidateSize(); }, 320);
       }
     }
 
     /* ── Case panel ── */
 
-    /* Known case timeline facts (Cases 1–10) */
+    /* Known case timeline facts (Cases 1-10) */
     var CASE_TIMELINE = {
-      1:  'Dutch male, ~70 yrs, ornithologist. Index case. Fell ill aboard MV Hondius; died Apr 11 on the ship.',
-      2:  'Dutch female, ~69 yrs, wife of Case 1. Fell ill after Case 1; died Apr 26 in Johannesburg, South Africa.',
-      3:  'British male. Admitted to ICU in South Africa. Confirmed Andes hantavirus.',
-      4:  'German female. Fell ill aboard MV Hondius; died May 2 on the ship.',
+      1:  "Dutch male, ~70 yrs, ornithologist. Index case. Fell ill aboard MV Hondius; died Apr 11 on the ship.",
+      2:  "Dutch female, ~69 yrs, wife of Case 1. Fell ill after Case 1; died Apr 26 in Johannesburg, South Africa.",
+      3:  "British male. Admitted to ICU in South Africa. Confirmed Andes hantavirus.",
+      4:  "German female. Fell ill aboard MV Hondius; died May 2 on the ship.",
       5:  "Dutch male, ~41 yrs, ship's doctor. Confirmed case; treated in the Netherlands.",
       6:  "British male, ~56 yrs, tour guide / crew member. Confirmed case; treated in the Netherlands.",
-      7:  'Swiss male. Confirmed case; treated in Zurich, Switzerland.',
-      8:  'British male, Tristan da Cunha resident. Probable case; island contact during voyage stop.',
-      9:  'French national. Tested positive May 11; in serious condition in Paris, France.',
-      10: 'American national. Tested positive May 10; reported asymptomatic in Nebraska, USA.'
+      7:  "Swiss male. Confirmed case; treated in Zurich, Switzerland.",
+      8:  "British male, Tristan da Cunha resident. Probable case; island contact during voyage stop.",
+      9:  "French national. Tested positive May 11; in serious condition in Paris, France.",
+      10: "American national. Tested positive May 10; reported asymptomatic in Nebraska, USA."
     };
 
     window.openCasePanel = function openCasePanel(data) {
       var panel = document.getElementById('case-panel');
       if (!panel) return;
 
-      /* Populate fields */
       var setEl = function(id, val) {
         var el = document.getElementById(id);
-        if (el) el.textContent = val || '—';
+        if (el) el.textContent = val || '\u2014';
       };
 
-      /* Parse numeric case id */
       var caseNum = parseInt(String(data.case_id || '').replace(/\D/g, ''), 10);
 
-      setEl('cp-case-num',        'Case #' + (data.case_id || '—'));
-      setEl('cp-location',        data.location_name || '—');
-      setEl('cp-location-detail', data.location_name || '—');
-      setEl('cp-date',            data.date_formatted || '—');
-      setEl('cp-age-sex',         data.age_sex || '—');
-      setEl('cp-exposure',        data.exposure_group || '—');
+      setEl('cp-case-num',        'Case #' + (data.case_id || '\u2014'));
+      setEl('cp-location',        data.location_name || '\u2014');
+      setEl('cp-location-detail', data.location_name || '\u2014');
+      setEl('cp-date',            data.date_formatted || '\u2014');
+      setEl('cp-age-sex',         data.age_sex || '\u2014');
+      setEl('cp-exposure',        data.exposure_group || '\u2014');
       setEl('cp-notes',           data.notes || 'No additional details.');
 
-      /* Coordinates */
       var coordsEl = document.getElementById('cp-coords');
       if (coordsEl) {
         if (data.lat && data.lon && data.lat !== '0.0000' && data.lon !== '0.0000') {
@@ -1065,7 +1107,6 @@
         }
       }
 
-      /* Timeline context for known cases 1–10 */
       var tlSection = document.getElementById('cp-timeline-section');
       var tlEl      = document.getElementById('cp-timeline');
       if (tlSection && tlEl) {
@@ -1077,54 +1118,53 @@
         }
       }
 
-      /* Status badge */
       var badge = document.getElementById('cp-status-badge');
       if (badge) {
         var colors = {
-          confirmed:  { bg: 'rgba(239,68,68,0.15)',  border: 'rgba(239,68,68,0.4)',  text: '#ef4444' },
-          suspected:  { bg: 'rgba(249,115,22,0.15)', border: 'rgba(249,115,22,0.4)', text: '#f97316' },
-          deceased:   { bg: 'rgba(139,92,246,0.15)', border: 'rgba(139,92,246,0.4)', text: '#8b5cf6' },
-          monitoring: { bg: 'rgba(14,165,233,0.15)', border: 'rgba(14,165,233,0.4)', text: '#0ea5e9' }
+          confirmed:  { bg: 'rgba(224,82,82,0.12)',   border: 'rgba(224,82,82,0.35)',   text: '#e05252' },
+          suspected:  { bg: 'rgba(224,123,82,0.12)',  border: 'rgba(224,123,82,0.35)',  text: '#e07b52' },
+          deceased:   { bg: 'rgba(155,89,182,0.12)',  border: 'rgba(155,89,182,0.35)',  text: '#9b59b6' },
+          monitoring: { bg: 'rgba(52,152,219,0.12)',  border: 'rgba(52,152,219,0.35)',  text: '#3498db' }
         };
         var key = (data.status || '').toLowerCase().split(' ')[0];
-        var c = colors[key] || { bg: 'rgba(100,116,139,0.15)', border: 'rgba(100,116,139,0.4)', text: '#94a3b8' };
+        var c = colors[key] || { bg: 'rgba(139,148,158,0.12)', border: 'rgba(139,148,158,0.35)', text: '#8b949e' };
         badge.style.cssText = 'background:' + c.bg + ';border:1px solid ' + c.border + ';color:' + c.text + ';';
-        badge.textContent = data.status || '—';
+        badge.textContent = data.status || '\u2014';
       }
 
-      /* Source link */
       var srcEl = document.getElementById('cp-source');
       if (srcEl) {
         if (data.source && data.source.startsWith('http')) {
-          srcEl.innerHTML = '<a href="' + data.source.replace(/"/g, '&quot;') + '" target="_blank" rel="noopener">View source ↗</a>';
+          srcEl.innerHTML = '<a href="' + data.source.replace(/"/g, '&quot;') + '" target="_blank" rel="noopener">View source &#x2197;</a>';
         } else {
-          srcEl.textContent = data.source || '—';
+          srcEl.textContent = data.source || '\u2014';
         }
       }
 
       panel.classList.add('open');
       panel.setAttribute('aria-hidden', 'false');
-      document.getElementById('case-panel-close').focus();
-    }
+      var closeBtn = document.getElementById('case-panel-close');
+      if (closeBtn) closeBtn.focus();
+    };
 
     window.closeCasePanel = function closeCasePanel() {
       var panel = document.getElementById('case-panel');
       if (!panel) return;
       panel.classList.remove('open');
       panel.setAttribute('aria-hidden', 'true');
-    }
+    };
 
-    /* Close panel on Escape */
     document.addEventListener('keydown', function(e) {
-      if (e.key === 'Escape') closeCasePanel();
+      if (e.key === 'Escape') window.closeCasePanel();
     });
 
     /* ── Mobile stats update ── */
     window.updateMobileStats = function(counts) {
-      var map = { confirmed: 'Confirmed', probable: 'Probable', suspected: 'Suspected', deceased: 'Deceased', monitoring: 'Monitoring' };
-      Object.entries(map).forEach(function(e) {
-        var el = document.getElementById('m-count-' + e[0]);
-        if (el) el.textContent = (counts[e[1]] !== undefined) ? counts[e[1]] : '—';
+      var keys = ['confirmed', 'suspected', 'deceased', 'monitoring'];
+      keys.forEach(function(key) {
+        var el = document.getElementById('m-count-' + key);
+        var cap = key.charAt(0).toUpperCase() + key.slice(1);
+        if (el) el.textContent = (counts[cap] !== undefined) ? counts[cap] : '\u2014';
       });
     };
   </script>
@@ -1135,4 +1175,3 @@
 
 </body>
 </html>
->
